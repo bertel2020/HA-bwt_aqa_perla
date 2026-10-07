@@ -1,0 +1,19 @@
+.DS_Store
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Local build/release artifacts
+bwt_aqa_perla.zip
+
+# Research inputs and proprietary/vendor software are intentionally not published
+Software_Soft_control_III/
+tmp/
+aqa perla auslesen.txt
+aqa perla auswerten.txt
+*.exe
+*.dll
+*.ocx
+*.cab

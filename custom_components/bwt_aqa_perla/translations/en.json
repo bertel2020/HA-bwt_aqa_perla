@@ -1,0 +1,65 @@
+{
+  "title": "BWT AQA Perla",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Select connection",
+        "description": "Choose how Home Assistant is connected to the BWT AQA Perla.",
+        "data": {"connection_type": "Connection type"}
+      },
+      "serial": {
+        "title": "Direct serial connection",
+        "data": {"serial_port": "Serial port", "baudrate": "Baud rate", "poll_interval": "Polling interval"},
+        "data_description": {
+          "serial_port": "Use a stable device path, such as /dev/serial/by-id/...",
+          "baudrate": "The existing setup uses 9600 baud; SoftControl uses a fixed 19200 baud. Use the setting of the actual appliance.",
+          "poll_interval": "Time between complete polls; at least 30 seconds."
+        }
+      },
+      "tcp": {
+        "title": "Serial over TCP",
+        "data": {"host": "Host", "tcp_port": "TCP port", "poll_interval": "Polling interval"},
+        "data_description": {
+          "host": "IP address or hostname of the transparent serial TCP bridge.",
+          "tcp_port": "Raw TCP port of the bridge, not HTTP or Telnet.",
+          "poll_interval": "Time between complete polls; at least 30 seconds."
+        }
+      }
+    },
+    "error": {"cannot_connect": "Failed to connect", "invalid_response": "The device responded with an invalid frame", "unknown": "Unexpected error"},
+    "abort": {"already_configured": "This connection is already configured"}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Communication options",
+        "description": "For a direct serial connection, changes take effect after the integration reloads automatically. Configure a TCP bridge's baud rate on the bridge itself.",
+        "data": {"baudrate": "Baud rate", "poll_interval": "Polling interval"}
+      }
+    }
+  },
+  "selector": {"connection_type": {"options": {"serial": "USB / serial", "tcp": "Serial over TCP"}}},
+  "entity": {
+    "sensor": {
+      "device_type": {"name": "Device type"},
+      "peak_flow_today": {"name": "Peak flow today"},
+      "peak_flow_24h": {"name": "Peak flow 24 h"},
+      "peak_flow_since_commissioning": {"name": "Peak flow since commissioning"},
+      "water_consumption_24h": {"name": "Water consumption 24 h"},
+      "total_water_consumption": {"name": "Total water consumption"},
+      "total_salt_consumption": {"name": "Total salt consumption"},
+      "nominal_capacity_column_1": {"name": "Nominal capacity column 1"},
+      "nominal_capacity_column_2": {"name": "Nominal capacity column 2"},
+      "remaining_capacity_column_1": {"name": "Remaining capacity column 1"},
+      "remaining_capacity_column_2": {"name": "Remaining capacity column 2"},
+      "regeneration_count": {"name": "Regenerations"},
+      "regeneration_count_since_service": {"name": "Regenerations since service"},
+      "regeneration_step": {"name": "Regeneration step"},
+      "regenerant_saving": {"name": "Regenerant saving"},
+      "commissioning_date": {"name": "Commissioning date"},
+      "software_version": {"name": "Combined software version"},
+      "software_version_power_electronics": {"name": "Power electronics software version"},
+      "software_version_control_panel": {"name": "Control panel software version"}
+    }
+  }
+}

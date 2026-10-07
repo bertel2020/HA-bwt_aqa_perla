@@ -1,0 +1,12 @@
+{
+  "domain": "bwt_aqa_perla",
+  "name": "BWT AQA Perla",
+  "codeowners": ["@bertel2020"],
+  "config_flow": true,
+  "documentation": "https://github.com/bertel2020/HA-bwt_aqa_perla",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/bertel2020/HA-bwt_aqa_perla/issues",
+  "requirements": ["pyserial-asyncio-fast==0.16"],
+  "version": "0.3.0"
+}

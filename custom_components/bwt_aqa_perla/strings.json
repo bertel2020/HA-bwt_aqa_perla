@@ -1,0 +1,91 @@
+{
+  "title": "BWT AQA Perla",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Verbindung auswählen",
+        "description": "Wähle, wie Home Assistant mit der BWT AQA Perla verbunden ist.",
+        "data": {
+          "connection_type": "Verbindungsart"
+        }
+      },
+      "serial": {
+        "title": "Direkte serielle Verbindung",
+        "data": {
+          "serial_port": "Serieller Port",
+          "baudrate": "Baudrate",
+          "poll_interval": "Abfrageintervall"
+        },
+        "data_description": {
+          "serial_port": "Stabilen Gerätepfad verwenden, z. B. /dev/serial/by-id/...",
+          "baudrate": "Der vorhandene Aufbau nutzt 9600 Baud; SoftControl verwendet dagegen fest 19200 Baud. Es gilt die Einstellung der konkreten Anlage.",
+          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden."
+        }
+      },
+      "tcp": {
+        "title": "Serial over TCP",
+        "data": {
+          "host": "Host",
+          "tcp_port": "TCP-Port",
+          "poll_interval": "Abfrageintervall"
+        },
+        "data_description": {
+          "host": "IP-Adresse oder Hostname der transparenten seriellen TCP-Bridge.",
+          "tcp_port": "Raw-TCP-Port der Bridge, nicht HTTP oder Telnet.",
+          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "invalid_response": "Das Gerät antwortet, aber das Telegramm ist ungültig",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "abort": {
+      "already_configured": "Diese Verbindung ist bereits konfiguriert"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Kommunikationsoptionen",
+        "description": "Bei direkter serieller Verbindung werden Änderungen nach dem Speichern durch einen automatischen Neustart der Integration wirksam. Die Baudrate einer TCP-Bridge muss an der Bridge selbst eingestellt werden.",
+        "data": {
+          "baudrate": "Baudrate",
+          "poll_interval": "Abfrageintervall"
+        }
+      }
+    }
+  },
+  "selector": {
+    "connection_type": {
+      "options": {
+        "serial": "USB / seriell",
+        "tcp": "Serial over TCP"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "device_type": {"name": "Gerätetyp"},
+      "peak_flow_today": {"name": "Spitzendurchfluss heute"},
+      "peak_flow_24h": {"name": "Spitzendurchfluss 24 h"},
+      "peak_flow_since_commissioning": {"name": "Spitzendurchfluss seit Inbetriebnahme"},
+      "water_consumption_24h": {"name": "Wasserverbrauch 24 h"},
+      "total_water_consumption": {"name": "Wasserverbrauch gesamt"},
+      "total_salt_consumption": {"name": "Salzverbrauch gesamt"},
+      "nominal_capacity_column_1": {"name": "Sollkapazität Säule 1"},
+      "nominal_capacity_column_2": {"name": "Sollkapazität Säule 2"},
+      "remaining_capacity_column_1": {"name": "Restkapazität Säule 1"},
+      "remaining_capacity_column_2": {"name": "Restkapazität Säule 2"},
+      "regeneration_count": {"name": "Regenerationen"},
+      "regeneration_count_since_service": {"name": "Regenerationen seit Service"},
+      "regeneration_step": {"name": "Regenerationsschritt"},
+      "regenerant_saving": {"name": "Regeneriermitteleinsparung"},
+      "commissioning_date": {"name": "Inbetriebnahmedatum"},
+      "software_version": {"name": "Softwareversion kombiniert"},
+      "software_version_power_electronics": {"name": "Softwareversion Leistungselektronik"},
+      "software_version_control_panel": {"name": "Softwareversion Bedienteil"}
+    }
+  }
+}
