@@ -181,7 +181,8 @@ def decode_value(payload: bytes, spec: QuerySpec) -> int | float | str:
                 f"Command 0x{spec.command:02X} returned invalid ASCII"
             ) from err
     raw = int.from_bytes(payload, byteorder="little", signed=False)
-    return raw if spec.scale == 1.0 else raw * spec.scale
+    # Round away binary floating-point noise such as 12.345000000000001.
+    return raw if spec.scale == 1.0 else round(raw * spec.scale, 6)
 
 
 def normalize_regeneration_step(raw_value: int) -> int:
