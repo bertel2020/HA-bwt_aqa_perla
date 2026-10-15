@@ -204,7 +204,7 @@ class BwtAqaPerlaSensor(CoordinatorEntity[BwtAqaPerlaCoordinator], SensorEntity)
             identifiers={(DOMAIN, entry.entry_id)},
             manufacturer=MANUFACTURER,
             model=MODEL,
-            name=MODEL,
+            name=entry.title,
         )
 
     @property
