@@ -4,19 +4,28 @@
     "step": {
       "user": {
         "title": "Select connection",
-        "description": "Choose how Home Assistant is connected to the BWT AQA Perla.",
-        "data": {
-          "connection_type": "Connection type"
+        "description": "How is the BWT AQA Perla connected to Home Assistant?",
+        "menu_options": {
+          "usb": "USB / serial",
+          "tcp": "Network (ser2net / TCP)"
         }
       },
-      "serial": {
-        "title": "Direct serial connection",
+      "reconfigure": {
+        "title": "Change connection",
+        "description": "How is the BWT AQA Perla connected to Home Assistant?",
+        "menu_options": {
+          "usb": "USB / serial",
+          "tcp": "Network (ser2net / TCP)"
+        }
+      },
+      "usb": {
+        "title": "USB / serial",
         "data": {
-          "serial_port": "Serial port",
+          "serial_port": "Device",
           "baudrate": "Baud rate"
         },
         "data_description": {
-          "serial_port": "Select a detected port or enter a path. Stable paths such as /dev/serial/by-id/... are preferred.",
+          "serial_port": "Device path of the interface. Prefer stable /dev/serial/by-id/… paths.",
           "baudrate": "The existing setup uses 9600 baud; SoftControl uses a fixed 19200 baud. Use the setting of the actual appliance."
         }
       },
@@ -52,14 +61,6 @@
           "poll_interval": "Polling interval",
           "fast_poll_interval": "Regeneration polling interval"
         }
-      }
-    }
-  },
-  "selector": {
-    "connection_type": {
-      "options": {
-        "serial": "USB / serial",
-        "tcp": "Serial over TCP (e.g. ser2net)"
       }
     }
   },

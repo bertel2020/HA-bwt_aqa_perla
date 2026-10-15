@@ -4,19 +4,28 @@
     "step": {
       "user": {
         "title": "Verbindung auswählen",
-        "description": "Wähle, wie Home Assistant mit der BWT AQA Perla verbunden ist.",
-        "data": {
-          "connection_type": "Verbindungsart"
+        "description": "Wie ist die BWT AQA Perla mit Home Assistant verbunden?",
+        "menu_options": {
+          "usb": "USB / seriell",
+          "tcp": "Netzwerk (ser2net / TCP)"
         }
       },
-      "serial": {
-        "title": "Direkte serielle Verbindung",
+      "reconfigure": {
+        "title": "Verbindung ändern",
+        "description": "Wie ist die BWT AQA Perla mit Home Assistant verbunden?",
+        "menu_options": {
+          "usb": "USB / seriell",
+          "tcp": "Netzwerk (ser2net / TCP)"
+        }
+      },
+      "usb": {
+        "title": "USB / seriell",
         "data": {
-          "serial_port": "Serieller Port",
+          "serial_port": "Gerät",
           "baudrate": "Baudrate"
         },
         "data_description": {
-          "serial_port": "Gefundene Ports auswählen oder einen Pfad eintragen. Stabile Pfade wie /dev/serial/by-id/... werden bevorzugt.",
+          "serial_port": "Gerätepfad der Schnittstelle. Stabile /dev/serial/by-id/…-Pfade bevorzugen.",
           "baudrate": "Der vorhandene Aufbau nutzt 9600 Baud; SoftControl verwendet dagegen fest 19200 Baud. Es gilt die Einstellung der konkreten Anlage."
         }
       },
@@ -52,14 +61,6 @@
           "poll_interval": "Abfrageintervall",
           "fast_poll_interval": "Abfrageintervall Regeneration"
         }
-      }
-    }
-  },
-  "selector": {
-    "connection_type": {
-      "options": {
-        "serial": "USB / seriell",
-        "tcp": "Serial over TCP (z. B. ser2net)"
       }
     }
   },

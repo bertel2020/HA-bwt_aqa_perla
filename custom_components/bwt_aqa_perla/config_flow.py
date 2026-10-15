@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import glob
-import os
 from typing import Any
 from urllib.parse import urlparse
 
@@ -21,10 +19,10 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
-    SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    SerialPortSelector,
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
@@ -34,13 +32,10 @@ from . import create_client
 from .client import BwtConnectionError
 from .const import (
     CONF_BAUDRATE,
-    CONF_CONNECTION_TYPE,
     CONF_FAST_POLL_INTERVAL,
     CONF_POLL_INTERVAL,
     CONF_SERIAL_PORT,
     CONF_TCP_PORT,
-    CONNECTION_SERIAL,
-    CONNECTION_TCP,
     DEFAULT_BAUDRATE,
     DEFAULT_FAST_POLL_INTERVAL,
     DEFAULT_POLL_INTERVAL,
@@ -54,28 +49,6 @@ from .const import (
     SUPPORTED_BAUDRATES,
 )
 from .protocol import QUERY_SPECS, BwtProtocolError
-
-
-def _list_serial_ports() -> list[SelectOptionDict]:
-    """Return local serial ports, preferring stable /dev/serial/by-id paths."""
-
-    try:
-        from serial.tools import list_ports
-
-        ports = list(list_ports.comports())
-    except ImportError, OSError:
-        return []
-
-    stable_paths = {
-        os.path.realpath(path): path for path in glob.glob("/dev/serial/by-id/*")
-    }
-    options: list[SelectOptionDict] = []
-    for port in sorted(ports, key=lambda item: item.device):
-        value = stable_paths.get(os.path.realpath(port.device), port.device)
-        description = port.description if port.description != "n/a" else ""
-        label = f"{value} ({description})" if description else value
-        options.append(SelectOptionDict(value=value, label=label))
-    return options
 
 
 def _normalize(user_input: dict[str, Any]) -> dict[str, Any]:
@@ -99,11 +72,6 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
     MINOR_VERSION = 3
 
-    def __init__(self) -> None:
-        """Initialize flow state."""
-
-        self._connection_type = CONNECTION_SERIAL
-
     @staticmethod
     @callback
     def async_get_options_flow(
@@ -116,30 +84,16 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Choose the transport."""
+        """Choose how the appliance is connected."""
 
-        if user_input is not None:
-            self._connection_type = user_input[CONF_CONNECTION_TYPE]
-            if self._connection_type == CONNECTION_SERIAL:
-                return await self.async_step_serial()
-            return await self.async_step_tcp()
+        return self.async_show_menu(step_id="user", menu_options=["usb", "tcp"])
 
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_CONNECTION_TYPE, default=CONNECTION_SERIAL
-                    ): SelectSelector(
-                        SelectSelectorConfig(
-                            options=[CONNECTION_SERIAL, CONNECTION_TCP],
-                            mode=SelectSelectorMode.DROPDOWN,
-                            translation_key="connection_type",
-                        )
-                    )
-                }
-            ),
-        )
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Choose the connection type for an existing entry."""
+
+        return self.async_show_menu(step_id="reconfigure", menu_options=["usb", "tcp"])
 
     async def _async_finish(
         self, data: dict[str, Any], title: str
@@ -158,10 +112,10 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
         return self.async_create_entry(title=title, data=data)
 
-    async def async_step_serial(
+    async def async_step_usb(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Configure a directly attached serial device."""
+        """Select a USB / serial device."""
 
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -180,11 +134,10 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
                 return result
             errors["base"] = result
 
-        ports = await self.hass.async_add_executor_job(_list_serial_ports)
         return self.async_show_form(
-            step_id="serial",
+            step_id="usb",
             data_schema=self.add_suggested_values_to_schema(
-                _serial_schema(ports), user_input or self._current_values()
+                USB_SCHEMA, user_input or self._current_values()
             ),
             errors=errors,
         )
@@ -213,20 +166,10 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="tcp",
             data_schema=self.add_suggested_values_to_schema(
-                _tcp_schema(), user_input or self._current_values()
+                TCP_SCHEMA, user_input or self._current_values()
             ),
             errors=errors,
         )
-
-    async def async_step_reconfigure(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        """Change the connection of an existing entry."""
-
-        port = self._get_reconfigure_entry().data[CONF_SERIAL_PORT]
-        if port.startswith(SOCKET_PREFIX):
-            return await self.async_step_tcp()
-        return await self.async_step_serial()
 
     def _current_values(self) -> dict[str, Any] | None:
         """Return form values of the entry being reconfigured, if any."""
@@ -274,18 +217,6 @@ def _interval_selector(minimum: int) -> NumberSelector:
     )
 
 
-def _serial_port_selector(ports: list[SelectOptionDict]) -> Any:
-    """Return a port dropdown that also accepts a manually typed path."""
-
-    if not ports:
-        return TextSelector(TextSelectorConfig(type=TextSelectorType.TEXT))
-    return SelectSelector(
-        SelectSelectorConfig(
-            options=ports, custom_value=True, mode=SelectSelectorMode.DROPDOWN
-        )
-    )
-
-
 def _baudrate_selector() -> SelectSelector:
     """Return baud rates supported by the original serial control."""
 
@@ -297,34 +228,24 @@ def _baudrate_selector() -> SelectSelector:
     )
 
 
-def _serial_schema(ports: list[SelectOptionDict]) -> vol.Schema:
-    """Return the direct-serial form schema."""
-
-    return vol.Schema(
-        {
-            vol.Required(CONF_SERIAL_PORT): _serial_port_selector(ports),
-            vol.Optional(
-                CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)
-            ): _baudrate_selector(),
-        }
-    )
-
-
-def _tcp_schema() -> vol.Schema:
-    """Return the TCP form schema."""
-
-    return vol.Schema(
-        {
-            vol.Required(CONF_HOST): TextSelector(
-                TextSelectorConfig(type=TextSelectorType.TEXT)
-            ),
-            vol.Optional(CONF_TCP_PORT, default=DEFAULT_TCP_PORT): NumberSelector(
-                NumberSelectorConfig(
-                    min=1, max=65535, step=1, mode=NumberSelectorMode.BOX
-                )
-            ),
-        }
-    )
+USB_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_SERIAL_PORT): SerialPortSelector(),
+        vol.Optional(
+            CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)
+        ): _baudrate_selector(),
+    }
+)
+TCP_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_HOST): TextSelector(
+            TextSelectorConfig(type=TextSelectorType.TEXT)
+        ),
+        vol.Optional(CONF_TCP_PORT, default=DEFAULT_TCP_PORT): NumberSelector(
+            NumberSelectorConfig(min=1, max=65535, step=1, mode=NumberSelectorMode.BOX)
+        ),
+    }
+)
 
 
 class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
