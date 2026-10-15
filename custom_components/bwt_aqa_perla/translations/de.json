@@ -28,10 +28,24 @@
           "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden.",
           "fast_poll_interval": "Zeit zwischen Abfragen des Regenerationsschritts; mindestens 5 Sekunden."
         }
+      },
+      "reconfigure": {
+        "title": "Verbindung ändern",
+        "data": {
+          "serial_port": "Serieller Port",
+          "host": "Host",
+          "tcp_port": "TCP-Port"
+        },
+        "data_description": {
+          "serial_port": "Gefundenen Port auswählen oder einen Pfad eintragen.",
+          "host": "IP-Adresse oder Hostname der Bridge bzw. des ser2net-Rechners.",
+          "tcp_port": "Raw-TCP-Port der Bridge."
+        }
       }
     },
     "error": {"cannot_connect": "Verbindung fehlgeschlagen", "invalid_response": "Das Gerät antwortet, aber das Telegramm ist ungültig", "unknown": "Unerwarteter Fehler"},
-    "abort": {"already_configured": "Diese Verbindung ist bereits konfiguriert"}
+    "abort": {"already_configured": "Diese Verbindung ist bereits konfiguriert",
+      "reconfigure_successful": "Die Verbindung wurde geändert."}
   },
   "options": {
     "step": {

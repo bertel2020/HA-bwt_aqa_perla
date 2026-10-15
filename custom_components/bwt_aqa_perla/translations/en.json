@@ -26,10 +26,23 @@
           "poll_interval": "Time between complete polls; at least 30 seconds.",
           "fast_poll_interval": "Time between reads of the regeneration step; at least 5 seconds."
         }
+      },
+      "reconfigure": {
+        "title": "Change connection",
+        "data": {
+          "serial_port": "Serial port",
+          "host": "Host",
+          "tcp_port": "TCP port"
+        },
+        "data_description": {
+          "serial_port": "Select a detected port or enter a path.",
+          "host": "IP address or hostname of the bridge or ser2net machine.",
+          "tcp_port": "Raw TCP port of the bridge."
+        }
       }
     },
     "error": {"cannot_connect": "Failed to connect", "invalid_response": "The device responded with an invalid frame", "unknown": "Unexpected error"},
-    "abort": {"already_configured": "This connection is already configured"}
+    "abort": {"already_configured": "This connection is already configured", "reconfigure_successful": "The connection was changed."}
   },
   "options": {
     "step": {

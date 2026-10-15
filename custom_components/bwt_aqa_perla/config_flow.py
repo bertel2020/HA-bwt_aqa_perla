@@ -168,6 +168,48 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="tcp", data_schema=_tcp_schema(), errors=errors
         )
 
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Change the serial port or the TCP host and port of an entry."""
+
+        entry = self._get_reconfigure_entry()
+        effective = {**entry.data, **entry.options}
+        is_serial = entry.data[CONF_CONNECTION_TYPE] == CONNECTION_SERIAL
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            errors = await self._async_validate({**effective, **user_input})
+            if not errors:
+                if is_serial:
+                    unique_id = f"serial:{user_input[CONF_SERIAL_PORT]}"
+                    title = entry.title
+                else:
+                    unique_id = (
+                        f"tcp:{user_input[CONF_HOST]}:{user_input[CONF_TCP_PORT]}"
+                    )
+                    title = f"BWT AQA Perla ({user_input[CONF_HOST]})"
+                await self.async_set_unique_id(unique_id)
+                self._abort_if_unique_id_configured()
+                return self.async_update_reload_and_abort(
+                    entry, unique_id=unique_id, title=title, data_updates=user_input
+                )
+
+        if is_serial:
+            ports = await self.hass.async_add_executor_job(_list_serial_ports)
+            schema = vol.Schema(
+                {vol.Required(CONF_SERIAL_PORT): _serial_port_selector(ports)}
+            )
+        else:
+            schema = _tcp_connection_schema()
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=self.add_suggested_values_to_schema(
+                schema, user_input or effective
+            ),
+            errors=errors,
+        )
+
     async def _async_validate(self, data: dict[str, Any]) -> dict[str, str]:
         """Connect and read one documented value before saving."""
 
@@ -251,19 +293,27 @@ def _baudrate_selector() -> SelectSelector:
     )
 
 
+def _tcp_connection_schema() -> vol.Schema:
+    """Return the host and port fields of the TCP form."""
+
+    return vol.Schema(
+        {
+            vol.Required(CONF_HOST): TextSelector(
+                TextSelectorConfig(type=TextSelectorType.TEXT)
+            ),
+            vol.Optional(CONF_TCP_PORT, default=DEFAULT_TCP_PORT): NumberSelector(
+                NumberSelectorConfig(
+                    min=1, max=65535, step=1, mode=NumberSelectorMode.BOX
+                )
+            ),
+        }
+    )
+
+
 def _tcp_schema() -> vol.Schema:
     """Return the TCP form schema."""
 
-    fields: dict = {
-        vol.Required(CONF_HOST): TextSelector(
-            TextSelectorConfig(type=TextSelectorType.TEXT)
-        ),
-        vol.Optional(CONF_TCP_PORT, default=DEFAULT_TCP_PORT): NumberSelector(
-            NumberSelectorConfig(min=1, max=65535, step=1, mode=NumberSelectorMode.BOX)
-        ),
-    }
-    fields.update(_poll_interval_fields())
-    return vol.Schema(fields)
+    return _tcp_connection_schema().extend(_poll_interval_fields())
 
 
 class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
