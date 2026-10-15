@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
+from unittest.mock import patch
 
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -118,3 +119,29 @@ async def test_diagnostics_redacts_target(
     assert result["last_update_success"] is True
     assert result["values"]["total_water_consumption"] == 5000
     assert result["last_frames"] == {"0x08": "0D 08 02 78 00 8F 0A"}
+
+
+async def test_slow_values_are_polled_less_often_than_fast_values(
+    hass: HomeAssistant, client: FakeClient, tcp_entry: MockConfigEntry
+) -> None:
+    now = [1000.0]
+    with patch(
+        "custom_components.bwt_aqa_perla.coordinator.time.monotonic",
+        side_effect=lambda: now[0],
+    ):
+        await _setup(hass, tcp_entry)
+        assert "total_water_consumption" in client.calls[0]
+        assert "regeneration_step" in client.calls[0]
+
+        # Next fast cycle: only the regeneration step is read.
+        now[0] += 15
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=16))
+        await hass.async_block_till_done()
+        assert client.calls[-1] == ["regeneration_step"]
+
+        # Once the slow interval has elapsed, everything is read again.
+        now[0] += 50
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=32))
+        await hass.async_block_till_done()
+        assert "total_water_consumption" in client.calls[-1]
+        assert "regeneration_step" in client.calls[-1]

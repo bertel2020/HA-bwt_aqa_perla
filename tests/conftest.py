@@ -39,6 +39,7 @@ class FakeClient:
         self.fail = False
         self.last_frames = {0x08: "0D 08 02 78 00 8F 0A"}
         self.closed = 0
+        self.calls: list[list[str]] = []
 
     async def async_query(self, spec):
         if self.fail:
@@ -46,6 +47,7 @@ class FakeClient:
         return self.values[spec.key]
 
     async def async_read(self, specs):
+        self.calls.append([spec.key for spec in specs])
         if self.fail:
             raise BwtConnectionError("boom")
         return {s.key: self.values[s.key] for s in specs if s.key in self.values}
