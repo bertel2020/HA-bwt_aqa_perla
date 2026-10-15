@@ -5,7 +5,7 @@
 All notable changes to this project are documented here. Versions follow the
 `version` field in `custom_components/bwt_aqa_perla/manifest.json`.
 
-## Unreleased
+## 1.1.0 – 2026-10-15
 
 ### Breaking changes
 
