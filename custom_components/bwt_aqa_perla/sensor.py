@@ -24,10 +24,15 @@ from .const import DOMAIN, MANUFACTURER, MODEL
 from .coordinator import BwtAqaPerlaCoordinator
 from .protocol import normalize_regeneration_step
 
+DEVICE_TYPES = range(16)
+REGENERATION_STEPS = range(42)
+
 SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         key="device_type",
         translation_key="device_type",
+        device_class=SensorDeviceClass.ENUM,
+        options=[f"type_{index}" for index in DEVICE_TYPES],
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
@@ -109,6 +114,8 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         key="regeneration_step",
         translation_key="regeneration_step",
+        device_class=SensorDeviceClass.ENUM,
+        options=[f"step_{index}" for index in REGENERATION_STEPS],
     ),
     SensorEntityDescription(
         key="regenerant_saving",
@@ -138,68 +145,6 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     ),
 )
 
-DEVICE_TYPES = {
-    0: "Kein Typ",
-    1: "Rondomat Duo 1",
-    2: "Rondomat Duo 2",
-    3: "Rondomat Duo 3",
-    4: "Rondomat Duo 6",
-    5: "Rondomat Duo 10",
-    6: "Rondomat Duo S1TW",
-    7: "Rondomat Duo S2TW",
-    8: "Rondomat Duo S3TW",
-    9: "Rondomat Duo 1 I",
-    10: "Rondomat Duo 2 I",
-    11: "Rondomat Duo 3 I",
-    12: "Aqua Perla",
-    13: "Aqua Life",
-    14: "Mephisto",
-    15: "Special",
-}
-REGENERATION_STEPS = {
-    0: "Säulen in Betrieb",
-    1: "Rückspülen",
-    2: "Besalzen",
-    3: "Keimschutz",
-    4: "Verdrängen",
-    5: "Nachspeisung 1 Solebehälter",
-    6: "Spülen",
-    7: "T7",
-    8: "Säulenwechsel-Start",
-    9: "Säulenwechsel",
-    10: "Nachspeisung 2 Solebehälter",
-    11: "T-Spülen",
-    12: "T-Spülen-1",
-    13: "T-Spülen-2",
-    14: "T-Spülen-3",
-    15: "T-Säulenwechsel-Start",
-    16: "T-Säulenwechsel-Pos",
-    17: "T-Power On",
-    18: "T-Power On-1",
-    19: "T-Power On-2",
-    20: "T-Power On-3",
-    21: "T-Power On-4",
-    22: "T-Power On-5",
-    23: "T-Power On-6",
-    24: "T-Power On >8h",
-    25: "T-Power On >8h-1",
-    26: "T-Neupositionierung",
-    27: "T-Neupositionierung-1",
-    28: "T-Power On break",
-    29: "T-Power On wait",
-    30: "T-Hygiene-0",
-    31: "T-Hygiene-1",
-    32: "T-Hygiene-2",
-    33: "T-Hygiene-3",
-    34: "T-Hygiene-4",
-    35: "T-Start_PowOff-1",
-    36: "T-Start_PowOff-2",
-    37: "T-DVGW-1",
-    38: "T-DVGW-2",
-    39: "T-Soleventil-0",
-    40: "T-Soleventil-1",
-    41: "T-Soleventil-2",
-}
 REGENERATION_SHORT_CODES = {
     0: "Normalbetrieb",
     **{value: f"T{value}" for value in range(1, 8)},
@@ -258,14 +203,14 @@ class BwtAqaPerlaSensor(CoordinatorEntity[BwtAqaPerlaCoordinator], SensorEntity)
 
         value = self.coordinator.data.get(self.entity_description.key)
         if self.entity_description.key == "device_type" and isinstance(value, int):
-            return DEVICE_TYPES.get(value, f"Typ {value}")
+            return f"type_{value}" if value in DEVICE_TYPES else None
         if self.entity_description.key == "software_version" and isinstance(value, str):
             return value.removeprefix("Version:").strip()
         if self.entity_description.key == "regeneration_step" and isinstance(
             value, int
         ):
             normalized = normalize_regeneration_step(value)
-            return REGENERATION_STEPS.get(normalized, f"Unbekannt ({normalized})")
+            return f"step_{normalized}" if normalized in REGENERATION_STEPS else None
         return value
 
     @property
