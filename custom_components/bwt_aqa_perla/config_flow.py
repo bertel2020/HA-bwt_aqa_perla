@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import glob
+import os
 from typing import Any
 
 import voluptuous as vol
@@ -17,6 +19,7 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
+    SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -47,6 +50,28 @@ from .const import (
     SUPPORTED_BAUDRATES,
 )
 from .protocol import QUERY_SPECS, BwtProtocolError
+
+
+def _list_serial_ports() -> list[SelectOptionDict]:
+    """Return local serial ports, preferring stable /dev/serial/by-id paths."""
+
+    try:
+        from serial.tools import list_ports
+
+        ports = list(list_ports.comports())
+    except (ImportError, OSError):
+        return []
+
+    stable_paths = {
+        os.path.realpath(path): path for path in glob.glob("/dev/serial/by-id/*")
+    }
+    options: list[SelectOptionDict] = []
+    for port in sorted(ports, key=lambda item: item.device):
+        value = stable_paths.get(os.path.realpath(port.device), port.device)
+        description = port.description if port.description != "n/a" else ""
+        label = f"{value} ({description})" if description else value
+        options.append(SelectOptionDict(value=value, label=label))
+    return options
 
 
 def _query_spec(key: str):
@@ -117,8 +142,9 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(title="BWT AQA Perla", data=data)
 
+        ports = await self.hass.async_add_executor_job(_list_serial_ports)
         return self.async_show_form(
-            step_id="serial", data_schema=_serial_schema(), errors=errors
+            step_id="serial", data_schema=_serial_schema(ports), errors=errors
         )
 
     async def async_step_tcp(
@@ -189,13 +215,23 @@ def _poll_interval_fields(
     }
 
 
-def _serial_schema() -> vol.Schema:
+def _serial_port_selector(ports: list[SelectOptionDict]) -> Any:
+    """Return a port dropdown that also accepts a manually typed path."""
+
+    if not ports:
+        return TextSelector(TextSelectorConfig(type=TextSelectorType.TEXT))
+    return SelectSelector(
+        SelectSelectorConfig(
+            options=ports, custom_value=True, mode=SelectSelectorMode.DROPDOWN
+        )
+    )
+
+
+def _serial_schema(ports: list[SelectOptionDict]) -> vol.Schema:
     """Return the direct-serial form schema."""
 
     fields: dict = {
-        vol.Required(CONF_SERIAL_PORT): TextSelector(
-            TextSelectorConfig(type=TextSelectorType.TEXT)
-        ),
+        vol.Required(CONF_SERIAL_PORT): _serial_port_selector(ports),
         vol.Optional(
             CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)
         ): _baudrate_selector(),

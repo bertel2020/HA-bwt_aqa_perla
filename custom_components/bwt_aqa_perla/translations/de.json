@@ -12,7 +12,7 @@
         "data": {"serial_port": "Serieller Port", "baudrate": "Baudrate", "poll_interval": "Abfrageintervall",
           "fast_poll_interval": "Abfrageintervall Regeneration"},
         "data_description": {
-          "serial_port": "Stabilen Gerätepfad verwenden, z. B. /dev/serial/by-id/...",
+          "serial_port": "Gefundene Ports auswählen oder einen Pfad eintragen. Stabile Pfade wie /dev/serial/by-id/... werden bevorzugt.",
           "baudrate": "Der vorhandene Aufbau nutzt 9600 Baud; SoftControl verwendet dagegen fest 19200 Baud. Es gilt die Einstellung der konkreten Anlage.",
           "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden.",
           "fast_poll_interval": "Zeit zwischen Abfragen des Regenerationsschritts; mindestens 5 Sekunden."
