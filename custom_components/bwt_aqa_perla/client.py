@@ -49,6 +49,7 @@ class BwtAqaPerlaClient:
         self._reader: asyncio.StreamReader | None = None
         self._writer: asyncio.StreamWriter | None = None
         self._lock = asyncio.Lock()
+        self.last_frames: dict[int, str] = {}
 
     @classmethod
     def for_tcp(cls, host: str, port: int, **kwargs: float) -> BwtAqaPerlaClient:
@@ -145,6 +146,7 @@ class BwtAqaPerlaClient:
                 async with asyncio.timeout(self._response_timeout):
                     frame = await self._async_read_frame(spec.command, query)
                 _LOGGER.debug("RX: %s", frame.hex(" ").upper())
+                self.last_frames[int(spec.command)] = frame.hex(" ").upper()
                 payload = parse_frame(frame, spec.command)
                 return decode_value(payload, spec)
             except (

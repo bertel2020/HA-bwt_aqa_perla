@@ -117,3 +117,9 @@ async def test_read_keeps_other_values_when_one_command_fails() -> None:
 async def test_read_raises_when_nothing_is_answered() -> None:
     with pytest.raises(client_module.BwtConnectionError):
         await make_client(b"").async_read([SPEC])
+
+
+async def test_query_records_last_frame() -> None:
+    client = make_client(RESPONSE)
+    await client.async_query(SPEC)
+    assert client.last_frames[int(SPEC.command)] == RESPONSE.hex(" ").upper()
