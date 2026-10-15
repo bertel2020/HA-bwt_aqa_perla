@@ -42,7 +42,7 @@ A UI-configurable Home Assistant custom integration for the older **BWT AQA Perl
 
 ## Requirements
 
-- Home Assistant **2026.2** or newer (tested against this version; older versions are not verified).
+- Home Assistant **2026.10** or newer (serial port picker and reconfiguration).
 - A BWT AQA Perla with a serial interface, connected through a USB serial/UART adapter on the Home Assistant host **or** a transparent raw TCP bridge (ser2net, RS232-Ethernet gateway, etc.).
 - Access to the interface by **exactly one** client at a time (see [Troubleshooting](#troubleshooting)).
 

@@ -5,7 +5,7 @@ German.
 
 ## Local development
 
-Python 3.13 is required.
+Python 3.14 is required.
 
 ```bash
 python3.13 -m venv .venv

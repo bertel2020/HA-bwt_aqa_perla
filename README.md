@@ -42,7 +42,7 @@ Eine über die Oberfläche konfigurierbare Home-Assistant-Custom-Integration fü
 
 ## Voraussetzungen
 
-- Home Assistant **2026.2** oder neuer (gegen diese Version getestet; ältere Versionen sind nicht geprüft).
+- Home Assistant **2026.10** oder neuer (Auswahl des seriellen Ports und Neukonfiguration).
 - Eine BWT AQA Perla mit serieller Schnittstelle, angebunden über einen USB-Seriell-/UART-Adapter am Rechner von Home Assistant **oder** eine transparente Raw-TCP-Bridge (ser2net, RS232-Ethernet-Gateway o. Ä.).
 - Zugriff auf die Schnittstelle durch **genau einen** Client gleichzeitig (siehe [Fehlersuche](#fehlersuche)).
 
