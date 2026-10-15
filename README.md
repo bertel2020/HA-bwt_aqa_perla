@@ -142,6 +142,23 @@ und bei direkter serieller Verbindung die Baudrate, lassen sich nach der
 Einrichtung unter
 **Einstellungen → Geräte & Dienste → BWT AQA Perla → Konfigurieren** ändern.
 Bei Serial over TCP muss die Baudrate direkt an der Bridge eingestellt werden.
+Port bzw. Host und TCP-Port lassen sich über das Menü der Integration unter
+**Verbindung neu konfigurieren** ändern, ohne sie neu anzulegen.
+
+Für Fehlersuche stellt die Integration unter **Diagnose herunterladen** die
+(geschwärzte) Konfiguration, die dekodierten Werte und je Befehl den zuletzt
+empfangenen Roh-Frame bereit; bitte bei Problemberichten anhängen.
+
+## Entwicklung
+
+```bash
+pip install -r requirements_test.txt
+ruff check . && ruff format --check .
+pytest
+```
+
+Die Tests laufen ohne Gerät; die Home-Assistant-Tests nutzen einen
+Fake-Client. Python 3.13 ist erforderlich.
 
 Die Integration enthält das aktuelle BWT-Markenlogo und das quadratische
 BWT-Appsymbol im von Home Assistant unterstützten lokalen `brand/`-Verzeichnis.
