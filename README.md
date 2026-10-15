@@ -35,10 +35,45 @@ Für USB sollte nach Möglichkeit ein stabiler Pfad wie
 `/dev/serial/by-id/...` statt `/dev/ttyUSB0` verwendet werden. Bei Home
 Assistant Container muss das USB-Gerät in den Container durchgereicht sein.
 
+Im Assistenten werden erkannte serielle Ports als Auswahl angeboten (stabile
+`/dev/serial/by-id/...`-Pfade zuerst); ein eigener Pfad kann weiterhin
+eingetragen werden.
+
 Die Serial-over-TCP-Variante erwartet eine **transparente Raw-TCP-Verbindung**.
 Die Bridge muss Baudrate, 8 Datenbits, keine Parität und 1 Stoppbit selbst am
 seriellen Anschluss einstellen. Telnet-, RFC2217-, HTTP- und Modbus-TCP-Gateways
 sind nicht gemeint.
+
+### Serial over TCP mit ser2net
+
+Auf einem Rechner mit angeschlossenem Adapter (z. B. Raspberry Pi) stellt
+[ser2net](https://github.com/cminyard/ser2net) den seriellen Port als Raw-TCP
+bereit. Beispiel für `/etc/ser2net.yaml` (ser2net 4.x):
+
+```yaml
+%YAML 1.1
+---
+connection: &bwt-aqa-perla
+  accepter: tcp,8899
+  enable: on
+  connector: serialdev,/dev/serial/by-id/usb-XXXX,9600n81,local
+```
+
+Bei ser2net 3.x lautet die entsprechende Zeile in `/etc/ser2net.conf`:
+
+```
+8899:raw:0:/dev/serial/by-id/usb-XXXX:9600 8DATABITS NONE 1STOPBIT
+```
+
+In der Integration **Serial over TCP** wählen, den Host des Rechners und den
+Port `8899` eintragen. Die Baudrate (`9600n81`) wird ausschließlich in ser2net
+eingestellt. Der Accepter `tcp` ist roh; `telnet(rfc2217)` oder `telnet` dürfen
+**nicht** verwendet werden.
+
+Die Abfrage öffnet pro Poll eine neue Verbindung. Greift gleichzeitig ein
+zweites System auf dieselbe Bridge zu (z. B. während einer Migration), kann es
+zu verzögerten oder fehlenden Antworten kommen. Die Integration überspringt
+fremde Antworten, sauber ist aber nur ein einziger aktiver Client.
 
 ## Wichtige Konfigurationsannahme
 
@@ -69,6 +104,11 @@ Konfiguration der konkreten Anlage.
 | `0x15` | Inbetriebnahmedatum | variabel | ASCII-Text |
 | `0x19` | Softwareversionen | variabel | Leistungselektronik und Bedienteil getrennt |
 
+Zusätzlich berechnet die Integration „Restkapazität Säule 1/2 (Prozent)“ aus
+Rest- und Sollkapazität (nicht bei ungenutzter Säule) und stellt den
+Binärsensor „Regeneration aktiv“ bereit, der eingeschaltet ist, solange der
+Regenerationsschritt nicht „Säulen in Betrieb“ ist.
+
 Die Diagnosebefehle sind optional, damit abweichende Firmwarestände die
 Kernmesswerte nicht blockieren. Die Einheit von Befehl `0x14` ist nicht
 abschließend geklärt. Der Wert bleibt deshalb ein optionaler Rohwert: Eine
@@ -84,7 +124,11 @@ Eine Antwort wie `Version: 3.94#155` wird zusätzlich in die Diagnosesensoren
 ## Kommunikation
 
 Die Implementierung liest längencodierte Frames vollständig ein, validiert
-Grenzen, Befehl und Prüfsumme und führt alle Abfragen nacheinander aus. Nach
+Grenzen, Befehl und Prüfsumme und führt alle Abfragen nacheinander aus. Antworten
+auf einen anderen Befehl (Echo, verspätete oder fremde Antworten) werden
+übersprungen. Schlägt eine einzelne Abfrage fehl, behalten die übrigen Sensoren ihren
+Wert; ein fehlender Wert bleibt erhalten und wird erst nach drei verpassten
+Abfragen „nicht verfügbar“. Nach
 jedem Poll wird die Verbindung geordnet geschlossen und beim nächsten Poll neu
 aufgebaut. Das reduziert das Risiko festgefahrener USB- oder
 Serial-over-TCP-Sitzungen.
@@ -92,7 +136,10 @@ Serial-over-TCP-Sitzungen.
 Home Assistant protokolliert Kommunikations- und Protokollfehler unter
 `custom_components.bwt_aqa_perla`.
 
-Baudrate und Abfrageintervall lassen sich nach der Einrichtung unter
+Der Regenerationsschritt wird schneller abgefragt (Standard 15 s, mindestens
+5 s) als alle übrigen Werte (Standard 60 s, mindestens 30 s). Beide Intervalle,
+und bei direkter serieller Verbindung die Baudrate, lassen sich nach der
+Einrichtung unter
 **Einstellungen → Geräte & Dienste → BWT AQA Perla → Konfigurieren** ändern.
 Bei Serial over TCP muss die Baudrate direkt an der Bridge eingestellt werden.
 

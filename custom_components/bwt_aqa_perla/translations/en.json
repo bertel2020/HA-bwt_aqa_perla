@@ -18,11 +18,11 @@
         }
       },
       "tcp": {
-        "title": "Serial over TCP",
+        "title": "Serial over TCP (ser2net)",
         "data": {"host": "Host", "tcp_port": "TCP port", "poll_interval": "Polling interval", "fast_poll_interval": "Regeneration polling interval"},
         "data_description": {
-          "host": "IP address or hostname of the transparent serial TCP bridge.",
-          "tcp_port": "Raw TCP port of the bridge, not HTTP or Telnet.",
+          "host": "IP address or hostname of the machine running ser2net or of the transparent serial TCP bridge.",
+          "tcp_port": "Raw TCP port of the bridge; for ser2net the tcp accepter port (default 8899), not Telnet/RFC2217.",
           "poll_interval": "Time between complete polls; at least 30 seconds.",
           "fast_poll_interval": "Time between reads of the regeneration step; at least 5 seconds."
         }
@@ -40,7 +40,7 @@
       }
     }
   },
-  "selector": {"connection_type": {"options": {"serial": "USB / serial", "tcp": "Serial over TCP"}}},
+  "selector": {"connection_type": {"options": {"serial": "USB / serial", "tcp": "Serial over TCP (e.g. ser2net)"}}},
   "entity": {
     "binary_sensor": {
       "regeneration_active": {"name": "Regeneration active"}

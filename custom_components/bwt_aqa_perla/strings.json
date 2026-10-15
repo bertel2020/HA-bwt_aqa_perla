@@ -25,7 +25,7 @@
         }
       },
       "tcp": {
-        "title": "Serial over TCP",
+        "title": "Serial over TCP (ser2net)",
         "data": {
           "host": "Host",
           "tcp_port": "TCP-Port",
@@ -33,8 +33,8 @@
           "fast_poll_interval": "Abfrageintervall Regeneration"
         },
         "data_description": {
-          "host": "IP-Adresse oder Hostname der transparenten seriellen TCP-Bridge.",
-          "tcp_port": "Raw-TCP-Port der Bridge, nicht HTTP oder Telnet.",
+          "host": "IP-Adresse oder Hostname des Rechners mit ser2net bzw. der transparenten seriellen TCP-Bridge.",
+          "tcp_port": "Raw-TCP-Port der Bridge, bei ser2net der Port des tcp-Accepters (Standard 8899), nicht Telnet/RFC2217.",
           "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden.",
           "fast_poll_interval": "Zeit zwischen Abfragen des Regenerationsschritts; mindestens 5 Sekunden."
         }
@@ -66,7 +66,7 @@
     "connection_type": {
       "options": {
         "serial": "USB / seriell",
-        "tcp": "Serial over TCP"
+        "tcp": "Serial over TCP (z. B. ser2net)"
       }
     }
   },
