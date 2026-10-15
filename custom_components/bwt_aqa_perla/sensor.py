@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import (
+    PERCENTAGE,
     EntityCategory,
     UnitOfMass,
     UnitOfVolume,
@@ -23,6 +24,8 @@ from . import BwtAqaPerlaConfigEntry
 from .const import DOMAIN, MANUFACTURER, MODEL
 from .coordinator import BwtAqaPerlaCoordinator
 from .protocol import normalize_regeneration_step
+
+PARALLEL_UPDATES = 0
 
 DEVICE_TYPES = range(16)
 REGENERATION_STEPS = range(42)
@@ -100,6 +103,20 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         translation_key="remaining_capacity_column_2",
         native_unit_of_measurement=UnitOfVolume.LITERS,
         state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="remaining_capacity_percent_column_1",
+        translation_key="remaining_capacity_percent_column_1",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+    ),
+    SensorEntityDescription(
+        key="remaining_capacity_percent_column_2",
+        translation_key="remaining_capacity_percent_column_2",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
     ),
     SensorEntityDescription(
         key="regeneration_count",

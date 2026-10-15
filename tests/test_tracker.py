@@ -53,3 +53,16 @@ def test_software_version_is_split() -> None:
     result = store.update(["software_version"], {"software_version": "Version: 3.94#155"})
     assert result["software_version_power_electronics"] == "3.94"
     assert result["software_version_control_panel"] == "155"
+
+
+def test_remaining_capacity_percent_is_derived() -> None:
+    result = tracker.derive_values(
+        {
+            "nominal_capacity_column_1": 800,
+            "remaining_capacity_column_1": 600,
+            "nominal_capacity_column_2": 0,
+            "remaining_capacity_column_2": 0,
+        }
+    )
+    assert result["remaining_capacity_percent_column_1"] == 75.0
+    assert "remaining_capacity_percent_column_2" not in result

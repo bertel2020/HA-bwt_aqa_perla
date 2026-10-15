@@ -5,7 +5,7 @@ from typing import Final
 from homeassistant.const import Platform
 
 DOMAIN: Final = "bwt_aqa_perla"
-PLATFORMS: Final = [Platform.SENSOR]
+PLATFORMS: Final = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
 CONF_CONNECTION_TYPE: Final = "connection_type"
 CONF_SERIAL_PORT: Final = "serial_port"

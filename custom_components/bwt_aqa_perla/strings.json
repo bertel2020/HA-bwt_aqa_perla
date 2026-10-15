@@ -71,6 +71,9 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "regeneration_active": {"name": "Regeneration aktiv"}
+    },
     "sensor": {
       "device_type": {
         "name": "Gerätetyp",
@@ -103,6 +106,8 @@
       "nominal_capacity_column_2": {"name": "Sollkapazität Säule 2"},
       "remaining_capacity_column_1": {"name": "Restkapazität Säule 1"},
       "remaining_capacity_column_2": {"name": "Restkapazität Säule 2"},
+      "remaining_capacity_percent_column_1": {"name": "Restkapazität Säule 1 (Prozent)"},
+      "remaining_capacity_percent_column_2": {"name": "Restkapazität Säule 2 (Prozent)"},
       "regeneration_count": {"name": "Regenerationen"},
       "regeneration_count_since_service": {"name": "Regenerationen seit Service"},
       "regeneration_step": {

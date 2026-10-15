@@ -42,6 +42,9 @@
   },
   "selector": {"connection_type": {"options": {"serial": "USB / serial", "tcp": "Serial over TCP"}}},
   "entity": {
+    "binary_sensor": {
+      "regeneration_active": {"name": "Regeneration active"}
+    },
     "sensor": {
       "device_type": {
         "name": "Device type",
@@ -74,6 +77,8 @@
       "nominal_capacity_column_2": {"name": "Nominal capacity column 2"},
       "remaining_capacity_column_1": {"name": "Remaining capacity column 1"},
       "remaining_capacity_column_2": {"name": "Remaining capacity column 2"},
+      "remaining_capacity_percent_column_1": {"name": "Remaining capacity column 1 (percent)"},
+      "remaining_capacity_percent_column_2": {"name": "Remaining capacity column 2 (percent)"},
       "regeneration_count": {"name": "Regenerations"},
       "regeneration_count_since_service": {"name": "Regenerations since service"},
       "regeneration_step": {

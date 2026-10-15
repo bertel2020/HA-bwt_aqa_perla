@@ -52,4 +52,15 @@ def derive_values(values: Mapping[str, Value]) -> dict[str, Value]:
         result["software_version_power_electronics"] = electronics
         if control_panel is not None:
             result["software_version_control_panel"] = control_panel
+    for column in (1, 2):
+        nominal = values.get(f"nominal_capacity_column_{column}")
+        remaining = values.get(f"remaining_capacity_column_{column}")
+        if (
+            isinstance(nominal, int | float)
+            and isinstance(remaining, int | float)
+            and nominal > 0
+        ):
+            result[f"remaining_capacity_percent_column_{column}"] = round(
+                remaining / nominal * 100, 1
+            )
     return result
