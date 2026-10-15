@@ -3,6 +3,7 @@
   "name": "BWT AQA Perla",
   "codeowners": ["@bertel2020"],
   "config_flow": true,
+  "dependencies": ["usb"],
   "documentation": "https://github.com/bertel2020/HA-bwt_aqa_perla",
   "integration_type": "device",
   "loggers": ["serial_asyncio_fast"],
