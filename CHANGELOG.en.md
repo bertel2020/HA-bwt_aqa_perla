@@ -5,11 +5,6 @@
 All notable changes to this project are documented here. Versions follow the
 `version` field in `custom_components/bwt_aqa_perla/manifest.json`.
 
-## 1.0.1 – 2026-10-15
-
-- The integration now ships an own logo and icon (water drop with a pearl, also for dark themes) instead of the BWT brand images. Version 1.0.0 still shipped the BWT images in the `brand/` directory.
-- The README shows the new logo and was reworked in the style of the other projects.
-
 ## 1.0.0 – 2026-10-15
 
 ### Breaking changes
@@ -28,7 +23,7 @@ All notable changes to this project are documented here. Versions follow the
 - Diagnostics download with redacted configuration, values and raw frames.
 - Sensors are only created for values the appliance actually reports.
 - The device is named after the config entry.
-- Icons for the sensors and an own logo (water drop with a pearl) instead of the BWT brand images, including a variant for dark themes.
+- Icons for the sensors and an own logo for the README.
 
 ### Fixed
 

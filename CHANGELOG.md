@@ -6,11 +6,6 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Versionen folgen dem Feld `version` in
 `custom_components/bwt_aqa_perla/manifest.json`.
 
-## 1.0.1 – 2026-10-15
-
-- Die Integration enthält jetzt ein eigenes Logo und Symbol (Wassertropfen mit Perle, auch für dunkle Oberflächen) statt der BWT-Markenabbildungen. Version 1.0.0 lieferte noch die BWT-Bilder im Verzeichnis `brand/` aus.
-- Die README zeigt das neue Logo und wurde im Stil der übrigen Projekte überarbeitet.
-
 ## 1.0.0 – 2026-10-15
 
 ### Achtung beim Update
@@ -29,7 +24,7 @@ Versionen folgen dem Feld `version` in
 - Diagnose-Download mit geschwärzter Konfiguration, Werten und Roh-Frames.
 - Sensoren werden nur für Werte angelegt, die die Anlage tatsächlich meldet.
 - Das Gerät heißt wie der Konfigurationseintrag.
-- Symbole für die Sensoren und ein eigenes Logo (Wassertropfen mit Perle) statt der BWT-Markenabbildungen, inklusive Variante für dunkle Oberflächen.
+- Symbole für die Sensoren und ein eigenes Logo für die README.
 
 ### Behoben
 
