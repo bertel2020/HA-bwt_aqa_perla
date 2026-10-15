@@ -8,6 +8,7 @@ from unittest.mock import patch
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -145,3 +146,48 @@ async def test_slow_values_are_polled_less_often_than_fast_values(
         await hass.async_block_till_done()
         assert "total_water_consumption" in client.calls[-1]
         assert "regeneration_step" in client.calls[-1]
+
+
+async def test_diagnostic_sensors_track_polls_and_stay_available(
+    hass: HomeAssistant, client: FakeClient, tcp_entry: MockConfigEntry
+) -> None:
+    await _setup(hass, tcp_entry)
+    last = _entity_id(hass, tcp_entry, "sensor", "last_successful_poll")
+    failed = _entity_id(hass, tcp_entry, "sensor", "failed_polls")
+    assert hass.states.get(last).state not in ("unknown", "unavailable")
+    assert hass.states.get(failed).state == "0"
+
+    client.fail = True
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=20))
+    await hass.async_block_till_done()
+    assert hass.states.get(failed).state == "1"
+    assert hass.states.get(last).state not in ("unknown", "unavailable")
+
+
+async def test_no_data_issue_is_raised_after_long_outage_and_cleared(
+    hass: HomeAssistant, client: FakeClient, tcp_entry: MockConfigEntry
+) -> None:
+    now = [1000.0]
+    issue_id = f"no_data_{tcp_entry.entry_id}"
+    with patch(
+        "custom_components.bwt_aqa_perla.coordinator.time.monotonic",
+        side_effect=lambda: now[0],
+    ):
+        await _setup(hass, tcp_entry)
+        registry = ir.async_get(hass)
+
+        client.fail = True
+        now[0] += 300
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=20))
+        await hass.async_block_till_done()
+        assert registry.async_get_issue(DOMAIN, issue_id) is None
+
+        now[0] += 400
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=40))
+        await hass.async_block_till_done()
+        assert registry.async_get_issue(DOMAIN, issue_id) is not None
+
+        client.fail = False
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=60))
+        await hass.async_block_till_done()
+        assert registry.async_get_issue(DOMAIN, issue_id) is None

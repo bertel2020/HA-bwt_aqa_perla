@@ -195,7 +195,19 @@
       },
       "software_version_control_panel": {
         "name": "Control panel software version"
+      },
+      "last_successful_poll": {
+        "name": "Last successful poll"
+      },
+      "failed_polls": {
+        "name": "Failed polls"
       }
+    }
+  },
+  "issues": {
+    "no_data": {
+      "title": "No data from the BWT AQA Perla",
+      "description": "No poll of {port} has succeeded for over 10 minutes. Check the connection, the bridge (ser2net) and the baud rate, and make sure no other system accesses the interface at the same time. The issue disappears once data arrives again."
     }
   }
 }

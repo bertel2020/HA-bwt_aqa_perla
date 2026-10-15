@@ -33,3 +33,6 @@ MAX_POLL_INTERVAL: Final = 3600
 MANUFACTURER: Final = "BWT"
 MODEL: Final = "AQA Perla"
 DEFAULT_TITLE: Final = "BWT AQA Perla"
+
+# A repair issue is raised after this long without a successful poll.
+NO_DATA_ISSUE_AFTER: Final = 600  # seconds

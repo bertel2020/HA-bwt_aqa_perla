@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
 
 from .client import BwtAqaPerlaClient
 from .const import (
@@ -102,6 +103,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: BwtAqaPerlaConfigEntry) 
     client = create_client(effective_config)
     coordinator = BwtAqaPerlaCoordinator(
         hass,
+        entry,
         client,
         int(effective_config.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)),
         int(effective_config.get(CONF_FAST_POLL_INTERVAL, DEFAULT_FAST_POLL_INTERVAL)),
@@ -120,4 +122,12 @@ async def async_unload_entry(
     if not await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         return False
     await entry.runtime_data.client.async_close()
+    return True
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, entry: ConfigEntry, device_entry: DeviceEntry
+) -> bool:
+    """Allow removing the device from the UI."""
+
     return True

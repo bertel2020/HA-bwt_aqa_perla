@@ -195,7 +195,19 @@
       },
       "software_version_control_panel": {
         "name": "Softwareversion Bedienteil"
+      },
+      "last_successful_poll": {
+        "name": "Letzte erfolgreiche Abfrage"
+      },
+      "failed_polls": {
+        "name": "Fehlgeschlagene Abfragen"
       }
+    }
+  },
+  "issues": {
+    "no_data": {
+      "title": "Keine Daten von der BWT AQA Perla",
+      "description": "Seit über 10 Minuten konnte keine Abfrage an {port} erfolgreich gelesen werden. Verbindung, Bridge (ser2net) und Baudrate prüfen und sicherstellen, dass kein anderes System gleichzeitig auf die Schnittstelle zugreift. Der Hinweis verschwindet, sobald wieder Daten ankommen."
     }
   }
 }

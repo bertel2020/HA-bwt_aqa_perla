@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -171,6 +173,21 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     ),
 )
 
+DIAGNOSTIC_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
+    SensorEntityDescription(
+        key="last_successful_poll",
+        translation_key="last_successful_poll",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    SensorEntityDescription(
+        key="failed_polls",
+        translation_key="failed_polls",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+)
+
 REGENERATION_SHORT_CODES = {
     0: "Normalbetrieb",
     **{value: f"T{value}" for value in range(1, 8)},
@@ -207,6 +224,10 @@ async def async_setup_entry(
     _async_add_new_sensors()
     # Optional commands that failed during the first poll may appear later.
     entry.async_on_unload(coordinator.async_add_listener(_async_add_new_sensors))
+    async_add_entities(
+        BwtAqaPerlaDiagnosticSensor(coordinator, entry, description)
+        for description in DIAGNOSTIC_DESCRIPTIONS
+    )
 
 
 class BwtAqaPerlaSensor(CoordinatorEntity[BwtAqaPerlaCoordinator], SensorEntity):
@@ -274,3 +295,21 @@ class BwtAqaPerlaSensor(CoordinatorEntity[BwtAqaPerlaCoordinator], SensorEntity)
         if short_code := REGENERATION_SHORT_CODES.get(normalized):
             attributes["short_code"] = short_code
         return attributes
+
+
+class BwtAqaPerlaDiagnosticSensor(BwtAqaPerlaSensor):
+    """Poll statistics of the integration itself; always available."""
+
+    @property
+    def available(self) -> bool:
+        """Report the statistics even while the appliance is unreachable."""
+
+        return True
+
+    @property
+    def native_value(self) -> datetime | int | None:
+        """Return the poll statistic."""
+
+        if self.entity_description.key == "last_successful_poll":
+            return self.coordinator.last_success
+        return self.coordinator.failed_polls
