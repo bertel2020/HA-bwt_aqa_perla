@@ -50,7 +50,9 @@ def test_values_not_requested_are_untouched() -> None:
 
 def test_software_version_is_split() -> None:
     store = tracker.ValueTracker()
-    result = store.update(["software_version"], {"software_version": "Version: 3.94#155"})
+    result = store.update(
+        ["software_version"], {"software_version": "Version: 3.94#155"}
+    )
     assert result["software_version_power_electronics"] == "3.94"
     assert result["software_version_control_panel"] == "155"
 

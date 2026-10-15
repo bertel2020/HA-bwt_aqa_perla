@@ -187,8 +187,7 @@ async def async_setup_entry(
         new_descriptions = [
             description
             for description in SENSOR_DESCRIPTIONS
-            if description.key in coordinator.data
-            and description.key not in known_keys
+            if description.key in coordinator.data and description.key not in known_keys
         ]
         known_keys.update(description.key for description in new_descriptions)
         async_add_entities(

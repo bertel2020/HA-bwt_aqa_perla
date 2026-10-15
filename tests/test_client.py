@@ -73,83 +73,47 @@ QUERY = protocol.build_query(SPEC.command)
 RESPONSE = protocol.build_frame(SPEC.command, (1234).to_bytes(2, "little"))
 
 
-def test_query_decodes_response() -> None:
-    asyncio.run(_test_query_decodes_response())
-
-
-async def _test_query_decodes_response() -> None:
+async def test_query_decodes_response() -> None:
     assert await make_client(RESPONSE).async_query(SPEC) == 1234
 
 
-def test_query_discards_noise_before_frame() -> None:
-    asyncio.run(_test_query_discards_noise_before_frame())
-
-
-async def _test_query_discards_noise_before_frame() -> None:
+async def test_query_discards_noise_before_frame() -> None:
     assert await make_client(b"\x00\xff" + RESPONSE).async_query(SPEC) == 1234
 
 
-def test_query_ignores_echoed_query() -> None:
-    asyncio.run(_test_query_ignores_echoed_query())
-
-
-async def _test_query_ignores_echoed_query() -> None:
+async def test_query_ignores_echoed_query() -> None:
     assert await make_client(QUERY + RESPONSE).async_query(SPEC) == 1234
 
 
-def test_query_skips_reply_to_other_command() -> None:
-    asyncio.run(_test_query_skips_reply_to_other_command())
-
-
-async def _test_query_skips_reply_to_other_command() -> None:
+async def test_query_skips_reply_to_other_command() -> None:
     other = protocol.build_frame(protocol.Command.REGENERATION_COUNT, b"\x01\x00")
     assert await make_client(other + RESPONSE).async_query(SPEC) == 1234
 
 
-def test_query_timeout_raises_connection_error() -> None:
-    asyncio.run(_test_query_timeout_raises_connection_error())
-
-
-async def _test_query_timeout_raises_connection_error() -> None:
+async def test_query_timeout_raises_connection_error() -> None:
     with pytest.raises(client_module.BwtConnectionError):
         await make_client(b"").async_query(SPEC)
 
 
-def test_bad_checksum_raises_protocol_error() -> None:
-    asyncio.run(_test_bad_checksum_raises_protocol_error())
-
-
-async def _test_bad_checksum_raises_protocol_error() -> None:
+async def test_bad_checksum_raises_protocol_error() -> None:
     corrupt = RESPONSE[:-2] + bytes(((RESPONSE[-2] + 1) & 0xFF, RESPONSE[-1]))
     with pytest.raises(protocol.BwtProtocolError):
         await make_client(corrupt).async_query(SPEC)
 
 
-def test_only_wrong_command_times_out() -> None:
-    asyncio.run(_test_only_wrong_command_times_out())
-
-
-async def _test_only_wrong_command_times_out() -> None:
+async def test_only_wrong_command_times_out() -> None:
     other = protocol.build_frame(protocol.Command.REGENERATION_COUNT, b"\x01\x00")
     with pytest.raises(client_module.BwtConnectionError):
         await make_client(other).async_query(SPEC)
 
 
-def test_read_keeps_other_values_when_one_command_fails() -> None:
-    asyncio.run(_test_read_keeps_other_values_when_one_command_fails())
-
-
-async def _test_read_keeps_other_values_when_one_command_fails() -> None:
+async def test_read_keeps_other_values_when_one_command_fails() -> None:
     other = next(s for s in protocol.QUERY_SPECS if s.key == "regeneration_count")
     client = make_client(RESPONSE)  # answers only the first command
     values = await client.async_read([SPEC, other])
     assert values == {"water_consumption_24h": 1234}
 
 
-def test_read_raises_when_nothing_is_answered() -> None:
-    asyncio.run(_test_read_raises_when_nothing_is_answered())
-
-
-async def _test_read_raises_when_nothing_is_answered() -> None:
+async def test_read_raises_when_nothing_is_answered() -> None:
     with pytest.raises(client_module.BwtConnectionError):
         await make_client(b"").async_read([SPEC])

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 from pathlib import Path
 
 import pytest
@@ -14,8 +15,6 @@ SPEC = importlib.util.spec_from_file_location("bwt_protocol_for_test", PROTOCOL_
 assert SPEC is not None and SPEC.loader is not None
 protocol = importlib.util.module_from_spec(SPEC)
 # Dataclasses look up their module while decorating the class.
-import sys
-
 sys.modules[SPEC.name] = protocol
 SPEC.loader.exec_module(protocol)
 

@@ -289,11 +289,7 @@ class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
         fields.update(
             _poll_interval_fields(
                 int(effective.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)),
-                int(
-                    effective.get(
-                        CONF_FAST_POLL_INTERVAL, DEFAULT_FAST_POLL_INTERVAL
-                    )
-                ),
+                int(effective.get(CONF_FAST_POLL_INTERVAL, DEFAULT_FAST_POLL_INTERVAL)),
             )
         )
         return self.async_show_form(step_id="init", data_schema=vol.Schema(fields))
