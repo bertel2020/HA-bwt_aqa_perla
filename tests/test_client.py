@@ -97,6 +97,15 @@ async def _test_query_ignores_echoed_query() -> None:
     assert await make_client(QUERY + RESPONSE).async_query(SPEC) == 1234
 
 
+def test_query_skips_reply_to_other_command() -> None:
+    asyncio.run(_test_query_skips_reply_to_other_command())
+
+
+async def _test_query_skips_reply_to_other_command() -> None:
+    other = protocol.build_frame(protocol.Command.REGENERATION_COUNT, b"\x01\x00")
+    assert await make_client(other + RESPONSE).async_query(SPEC) == 1234
+
+
 def test_query_timeout_raises_connection_error() -> None:
     asyncio.run(_test_query_timeout_raises_connection_error())
 
@@ -116,11 +125,11 @@ async def _test_bad_checksum_raises_protocol_error() -> None:
         await make_client(corrupt).async_query(SPEC)
 
 
-def test_wrong_command_raises_protocol_error() -> None:
-    asyncio.run(_test_wrong_command_raises_protocol_error())
+def test_only_wrong_command_times_out() -> None:
+    asyncio.run(_test_only_wrong_command_times_out())
 
 
-async def _test_wrong_command_raises_protocol_error() -> None:
+async def _test_only_wrong_command_times_out() -> None:
     other = protocol.build_frame(protocol.Command.REGENERATION_COUNT, b"\x01\x00")
-    with pytest.raises(protocol.BwtProtocolError):
+    with pytest.raises(client_module.BwtConnectionError):
         await make_client(other).async_query(SPEC)

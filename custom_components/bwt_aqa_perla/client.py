@@ -103,11 +103,12 @@ class BwtAqaPerlaClient:
         except (OSError, RuntimeError):
             pass
 
-    async def _async_read_frame(self, echo: bytes | None = None) -> bytes:
-        """Read one length-framed response, resynchronizing on 0x0D.
+    async def _async_read_frame(self, command: int, echo: bytes) -> bytes:
+        """Read the response to `command`, resynchronizing on 0x0D.
 
-        Adapters that echo transmitted bytes return the query first; such a
-        frame is skipped instead of being treated as the response.
+        Frames that do not answer this command are skipped until the timeout
+        expires: an echoed query, a late reply to the previous command, or
+        a reply to another client sharing the bus or bridge.
         """
 
         assert self._reader is not None
@@ -123,8 +124,8 @@ class BwtAqaPerlaClient:
             frame = first + header_tail + remainder
             if frame[-1] != END_BYTE:
                 raise BwtProtocolError("Frame has no end marker")
-            if frame == echo:
-                _LOGGER.debug("Ignoring echoed query")
+            if frame == echo or frame[1] != command:
+                _LOGGER.debug("Ignoring unrelated frame: %s", frame.hex(" ").upper())
                 continue
             return frame
 
@@ -140,7 +141,7 @@ class BwtAqaPerlaClient:
                 self._writer.write(query)
                 await self._writer.drain()
                 async with asyncio.timeout(self._response_timeout):
-                    frame = await self._async_read_frame(query)
+                    frame = await self._async_read_frame(spec.command, query)
                 _LOGGER.debug("RX: %s", frame.hex(" ").upper())
                 payload = parse_frame(frame, spec.command)
                 return decode_value(payload, spec)
