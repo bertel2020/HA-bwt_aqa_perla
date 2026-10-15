@@ -44,6 +44,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfVolumeFlowRate.LITERS_PER_HOUR,
         device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="peak_flow_24h",
@@ -51,6 +52,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfVolumeFlowRate.LITERS_PER_HOUR,
         device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="peak_flow_since_commissioning",
@@ -58,6 +60,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfVolumeFlowRate.LITERS_PER_HOUR,
         device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="water_consumption_24h",
@@ -80,31 +83,35 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfMass.KILOGRAMS,
         device_class=SensorDeviceClass.WEIGHT,
         state_class=SensorStateClass.TOTAL_INCREASING,
-        suggested_display_precision=3,
+        suggested_display_precision=2,
     ),
     SensorEntityDescription(
         key="nominal_capacity_column_1",
         translation_key="nominal_capacity_column_1",
         native_unit_of_measurement=UnitOfVolume.LITERS,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="nominal_capacity_column_2",
         translation_key="nominal_capacity_column_2",
         native_unit_of_measurement=UnitOfVolume.LITERS,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="remaining_capacity_column_1",
         translation_key="remaining_capacity_column_1",
         native_unit_of_measurement=UnitOfVolume.LITERS,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="remaining_capacity_column_2",
         translation_key="remaining_capacity_column_2",
         native_unit_of_measurement=UnitOfVolume.LITERS,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="remaining_capacity_percent_column_1",
