@@ -9,20 +9,24 @@
       },
       "serial": {
         "title": "Direkte serielle Verbindung",
-        "data": {"serial_port": "Serieller Port", "baudrate": "Baudrate", "poll_interval": "Abfrageintervall"},
+        "data": {"serial_port": "Serieller Port", "baudrate": "Baudrate", "poll_interval": "Abfrageintervall",
+          "fast_poll_interval": "Abfrageintervall Regeneration"},
         "data_description": {
           "serial_port": "Stabilen Gerätepfad verwenden, z. B. /dev/serial/by-id/...",
           "baudrate": "Der vorhandene Aufbau nutzt 9600 Baud; SoftControl verwendet dagegen fest 19200 Baud. Es gilt die Einstellung der konkreten Anlage.",
-          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden."
+          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden.",
+          "fast_poll_interval": "Zeit zwischen Abfragen des Regenerationsschritts; mindestens 5 Sekunden."
         }
       },
       "tcp": {
         "title": "Serial over TCP",
-        "data": {"host": "Host", "tcp_port": "TCP-Port", "poll_interval": "Abfrageintervall"},
+        "data": {"host": "Host", "tcp_port": "TCP-Port", "poll_interval": "Abfrageintervall",
+          "fast_poll_interval": "Abfrageintervall Regeneration"},
         "data_description": {
           "host": "IP-Adresse oder Hostname der transparenten seriellen TCP-Bridge.",
           "tcp_port": "Raw-TCP-Port der Bridge, nicht HTTP oder Telnet.",
-          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden."
+          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden.",
+          "fast_poll_interval": "Zeit zwischen Abfragen des Regenerationsschritts; mindestens 5 Sekunden."
         }
       }
     },
@@ -34,7 +38,8 @@
       "init": {
         "title": "Kommunikationsoptionen",
         "description": "Bei direkter serieller Verbindung werden Änderungen nach dem Speichern durch einen automatischen Neustart der Integration wirksam. Die Baudrate einer TCP-Bridge muss an der Bridge selbst eingestellt werden.",
-        "data": {"baudrate": "Baudrate", "poll_interval": "Abfrageintervall"}
+        "data": {"baudrate": "Baudrate", "poll_interval": "Abfrageintervall",
+          "fast_poll_interval": "Abfrageintervall Regeneration"}
       }
     }
   },

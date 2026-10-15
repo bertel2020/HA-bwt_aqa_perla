@@ -56,6 +56,7 @@ class QuerySpec:
     expected_length: int | None
     scale: float = 1.0
     optional: bool = False
+    fast: bool = False
     value_type: ValueType = ValueType.UNSIGNED_LITTLE_ENDIAN
 
 
@@ -83,7 +84,7 @@ QUERY_SPECS: tuple[QuerySpec, ...] = (
         2,
         optional=True,
     ),
-    QuerySpec("regeneration_step", Command.REGENERATION_STEP, 1),
+    QuerySpec("regeneration_step", Command.REGENERATION_STEP, 1, fast=True),
     # The supplied script queries command 0x14 but never parses its response.
     # A published capture documents two bytes; it remains optional so an older
     # or different firmware cannot make all other readings unavailable.
@@ -103,6 +104,9 @@ QUERY_SPECS: tuple[QuerySpec, ...] = (
         value_type=ValueType.ASCII,
     ),
 )
+
+FAST_SPECS: tuple[QuerySpec, ...] = tuple(spec for spec in QUERY_SPECS if spec.fast)
+SLOW_SPECS: tuple[QuerySpec, ...] = tuple(spec for spec in QUERY_SPECS if not spec.fast)
 
 
 class BwtProtocolError(Exception):

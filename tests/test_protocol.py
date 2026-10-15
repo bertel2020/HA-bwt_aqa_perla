@@ -161,3 +161,11 @@ def test_rejects_wrong_payload_length() -> None:
     )
     with pytest.raises(protocol.BwtResponseError):
         protocol.decode_value(b"\x01", spec)
+
+
+def test_fast_and_slow_specs_partition_all_queries() -> None:
+    assert [s.key for s in protocol.FAST_SPECS] == ["regeneration_step"]
+    assert set(protocol.FAST_SPECS) | set(protocol.SLOW_SPECS) == set(
+        protocol.QUERY_SPECS
+    )
+    assert not set(protocol.FAST_SPECS) & set(protocol.SLOW_SPECS)

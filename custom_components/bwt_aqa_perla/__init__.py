@@ -12,10 +12,12 @@ from .client import BwtAqaPerlaClient
 from .const import (
     CONF_BAUDRATE,
     CONF_CONNECTION_TYPE,
+    CONF_FAST_POLL_INTERVAL,
     CONF_POLL_INTERVAL,
     CONF_SERIAL_PORT,
     CONF_TCP_PORT,
     CONNECTION_SERIAL,
+    DEFAULT_FAST_POLL_INTERVAL,
     DEFAULT_POLL_INTERVAL,
     PLATFORMS,
 )
@@ -52,6 +54,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: BwtAqaPerlaConfigEntry) 
         hass,
         client,
         int(effective_config.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)),
+        int(
+            effective_config.get(
+                CONF_FAST_POLL_INTERVAL, DEFAULT_FAST_POLL_INTERVAL
+            )
+        ),
     )
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = BwtAqaPerlaRuntimeData(client, coordinator)

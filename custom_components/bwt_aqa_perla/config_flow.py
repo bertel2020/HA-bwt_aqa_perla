@@ -30,15 +30,20 @@ from .client import BwtConnectionError
 from .const import (
     CONF_BAUDRATE,
     CONF_CONNECTION_TYPE,
+    CONF_FAST_POLL_INTERVAL,
     CONF_POLL_INTERVAL,
     CONF_SERIAL_PORT,
     CONF_TCP_PORT,
     CONNECTION_SERIAL,
     CONNECTION_TCP,
     DEFAULT_BAUDRATE,
+    DEFAULT_FAST_POLL_INTERVAL,
     DEFAULT_POLL_INTERVAL,
     DEFAULT_TCP_PORT,
     DOMAIN,
+    MAX_POLL_INTERVAL,
+    MIN_FAST_POLL_INTERVAL,
+    MIN_POLL_INTERVAL,
     SUPPORTED_BAUDRATES,
 )
 from .protocol import QUERY_SPECS, BwtProtocolError
@@ -154,19 +159,33 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
         return {}
 
 
-def _poll_interval_field() -> dict:
-    """Return the common polling interval schema field."""
+def _interval_selector(minimum: int) -> NumberSelector:
+    """Return a seconds selector with the given minimum."""
+
+    return NumberSelector(
+        NumberSelectorConfig(
+            min=minimum,
+            max=MAX_POLL_INTERVAL,
+            step=1,
+            mode=NumberSelectorMode.BOX,
+            unit_of_measurement="s",
+        )
+    )
+
+
+def _poll_interval_fields(
+    poll_interval: int = DEFAULT_POLL_INTERVAL,
+    fast_poll_interval: int = DEFAULT_FAST_POLL_INTERVAL,
+) -> dict:
+    """Return the common polling interval schema fields."""
 
     return {
-        vol.Optional(CONF_POLL_INTERVAL, default=DEFAULT_POLL_INTERVAL): NumberSelector(
-            NumberSelectorConfig(
-                min=30,
-                max=3600,
-                step=1,
-                mode=NumberSelectorMode.BOX,
-                unit_of_measurement="s",
-            )
-        )
+        vol.Optional(CONF_POLL_INTERVAL, default=poll_interval): _interval_selector(
+            MIN_POLL_INTERVAL
+        ),
+        vol.Optional(
+            CONF_FAST_POLL_INTERVAL, default=fast_poll_interval
+        ): _interval_selector(MIN_FAST_POLL_INTERVAL),
     }
 
 
@@ -181,7 +200,7 @@ def _serial_schema() -> vol.Schema:
             CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)
         ): _baudrate_selector(),
     }
-    fields.update(_poll_interval_field())
+    fields.update(_poll_interval_fields())
     return vol.Schema(fields)
 
 
@@ -207,7 +226,7 @@ def _tcp_schema() -> vol.Schema:
             NumberSelectorConfig(min=1, max=65535, step=1, mode=NumberSelectorMode.BOX)
         ),
     }
-    fields.update(_poll_interval_field())
+    fields.update(_poll_interval_fields())
     return vol.Schema(fields)
 
 
@@ -231,18 +250,14 @@ class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
                     default=str(effective.get(CONF_BAUDRATE, DEFAULT_BAUDRATE)),
                 )
             ] = _baudrate_selector()
-        fields[
-            vol.Optional(
-                CONF_POLL_INTERVAL,
-                default=int(effective.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)),
-            )
-        ] = NumberSelector(
-            NumberSelectorConfig(
-                min=30,
-                max=3600,
-                step=1,
-                mode=NumberSelectorMode.BOX,
-                unit_of_measurement="s",
+        fields.update(
+            _poll_interval_fields(
+                int(effective.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)),
+                int(
+                    effective.get(
+                        CONF_FAST_POLL_INTERVAL, DEFAULT_FAST_POLL_INTERVAL
+                    )
+                ),
             )
         )
         return self.async_show_form(step_id="init", data_schema=vol.Schema(fields))

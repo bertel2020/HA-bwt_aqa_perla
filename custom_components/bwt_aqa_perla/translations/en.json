@@ -9,20 +9,22 @@
       },
       "serial": {
         "title": "Direct serial connection",
-        "data": {"serial_port": "Serial port", "baudrate": "Baud rate", "poll_interval": "Polling interval"},
+        "data": {"serial_port": "Serial port", "baudrate": "Baud rate", "poll_interval": "Polling interval", "fast_poll_interval": "Regeneration polling interval"},
         "data_description": {
           "serial_port": "Use a stable device path, such as /dev/serial/by-id/...",
           "baudrate": "The existing setup uses 9600 baud; SoftControl uses a fixed 19200 baud. Use the setting of the actual appliance.",
-          "poll_interval": "Time between complete polls; at least 30 seconds."
+          "poll_interval": "Time between complete polls; at least 30 seconds.",
+          "fast_poll_interval": "Time between reads of the regeneration step; at least 5 seconds."
         }
       },
       "tcp": {
         "title": "Serial over TCP",
-        "data": {"host": "Host", "tcp_port": "TCP port", "poll_interval": "Polling interval"},
+        "data": {"host": "Host", "tcp_port": "TCP port", "poll_interval": "Polling interval", "fast_poll_interval": "Regeneration polling interval"},
         "data_description": {
           "host": "IP address or hostname of the transparent serial TCP bridge.",
           "tcp_port": "Raw TCP port of the bridge, not HTTP or Telnet.",
-          "poll_interval": "Time between complete polls; at least 30 seconds."
+          "poll_interval": "Time between complete polls; at least 30 seconds.",
+          "fast_poll_interval": "Time between reads of the regeneration step; at least 5 seconds."
         }
       }
     },
@@ -34,7 +36,7 @@
       "init": {
         "title": "Communication options",
         "description": "For a direct serial connection, changes take effect after the integration reloads automatically. Configure a TCP bridge's baud rate on the bridge itself.",
-        "data": {"baudrate": "Baud rate", "poll_interval": "Polling interval"}
+        "data": {"baudrate": "Baud rate", "poll_interval": "Polling interval", "fast_poll_interval": "Regeneration polling interval"}
       }
     }
   },
