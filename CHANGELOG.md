@@ -39,4 +39,4 @@
 
 ## 0.3.0
 
-Erste veröffentlichte Version.
+Vorherige Version (Stand der Erstveröffentlichung im Repository).
