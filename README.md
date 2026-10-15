@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bertel2020/HA-bwt_aqa_perla/main/custom_components/bwt_aqa_perla/brand/logo.png" alt="BWT AQA Perla" width="160">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/bertel2020/HA-bwt_aqa_perla/main/custom_components/bwt_aqa_perla/brand/dark_logo.png">
+    <img src="https://raw.githubusercontent.com/bertel2020/HA-bwt_aqa_perla/main/custom_components/bwt_aqa_perla/brand/logo.png" alt="BWT AQA Perla" width="320">
+  </picture>
 </p>
 
 <h1 align="center">BWT AQA Perla</h1>
