@@ -14,7 +14,7 @@ from homeassistant.const import (
     UnitOfVolume,
     UnitOfVolumeFlowRate,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -160,10 +160,28 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensors from a config entry."""
 
-    async_add_entities(
-        BwtAqaPerlaSensor(entry.runtime_data.coordinator, entry, description)
-        for description in SENSOR_DESCRIPTIONS
-    )
+    coordinator = entry.runtime_data.coordinator
+    known_keys: set[str] = set()
+
+    @callback
+    def _async_add_new_sensors() -> None:
+        """Create sensors for values the device has reported so far."""
+
+        new_descriptions = [
+            description
+            for description in SENSOR_DESCRIPTIONS
+            if description.key in coordinator.data
+            and description.key not in known_keys
+        ]
+        known_keys.update(description.key for description in new_descriptions)
+        async_add_entities(
+            BwtAqaPerlaSensor(coordinator, entry, description)
+            for description in new_descriptions
+        )
+
+    _async_add_new_sensors()
+    # Optional commands that failed during the first poll may appear later.
+    entry.async_on_unload(coordinator.async_add_listener(_async_add_new_sensors))
 
 
 class BwtAqaPerlaSensor(CoordinatorEntity[BwtAqaPerlaCoordinator], SensorEntity):
