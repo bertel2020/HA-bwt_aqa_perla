@@ -1,4 +1,4 @@
-"""Render the integration's own icon and logo (Pillow only, no cairo needed).
+"""Render the own README logo (Pillow only, no cairo needed).
 
 The drop outline is the same cubic path used in assets/icon.svg.
 
@@ -12,7 +12,6 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).parents[1]
-BRAND = ROOT / "custom_components" / "bwt_aqa_perla" / "brand"
 SS = 4  # supersampling factor
 
 DEEP = (14, 76, 146)
@@ -157,17 +156,13 @@ def render_logo(height: int, text_color) -> Image.Image:
 
 
 def main() -> None:
-    BRAND.mkdir(parents=True, exist_ok=True)
-    render_icon(256).save(BRAND / "icon.png")
-    render_icon(512).save(BRAND / "icon@2x.png")
-    for suffix, height in (("", 256), ("@2x", 512)):
-        render_logo(height, INK).save(BRAND / f"logo{suffix}.png")
-        render_logo(height, (235, 245, 252)).save(BRAND / f"dark_logo{suffix}.png")
-    # README copies under a path GitHub's raw CDN has never cached.
-    (ROOT / "assets").mkdir(exist_ok=True)
-    render_logo(256, INK).save(ROOT / "assets" / "logo.png")
-    render_logo(256, (235, 245, 252)).save(ROOT / "assets" / "logo_dark.png")
-    print("written to", BRAND)
+    """Render the README logo; the integration's brand/ images stay untouched."""
+
+    out = ROOT / "assets"
+    out.mkdir(exist_ok=True)
+    render_logo(256, INK).save(out / "logo.png")
+    render_logo(256, (235, 245, 252)).save(out / "logo_dark.png")
+    print("written to", out)
 
 
 if __name__ == "__main__":
