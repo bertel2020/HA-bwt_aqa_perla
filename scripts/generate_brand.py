@@ -163,6 +163,10 @@ def main() -> None:
     for suffix, height in (("", 256), ("@2x", 512)):
         render_logo(height, INK).save(BRAND / f"logo{suffix}.png")
         render_logo(height, (235, 245, 252)).save(BRAND / f"dark_logo{suffix}.png")
+    # README copies under a path GitHub's raw CDN has never cached.
+    (ROOT / "assets").mkdir(exist_ok=True)
+    render_logo(256, INK).save(ROOT / "assets" / "logo.png")
+    render_logo(256, (235, 245, 252)).save(ROOT / "assets" / "logo_dark.png")
     print("written to", BRAND)
 
 

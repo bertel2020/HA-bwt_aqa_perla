@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/bertel2020/HA-bwt_aqa_perla/main/custom_components/bwt_aqa_perla/brand/dark_logo.png?v=2">
-    <img src="https://raw.githubusercontent.com/bertel2020/HA-bwt_aqa_perla/main/custom_components/bwt_aqa_perla/brand/logo.png?v=2" alt="BWT AQA Perla" width="320">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/bertel2020/HA-bwt_aqa_perla/main/assets/logo_dark.png">
+    <img src="https://raw.githubusercontent.com/bertel2020/HA-bwt_aqa_perla/main/assets/logo.png" alt="BWT AQA Perla" width="320">
   </picture>
 </p>
 
