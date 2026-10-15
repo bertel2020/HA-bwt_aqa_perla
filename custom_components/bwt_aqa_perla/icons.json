@@ -1,0 +1,28 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "regeneration_active": {
+        "default": "mdi:cog-outline",
+        "state": {"on": "mdi:cog-sync"}
+      }
+    },
+    "sensor": {
+      "device_type": {"default": "mdi:tag-outline"},
+      "regeneration_step": {"default": "mdi:cog-sync"},
+      "regeneration_count": {"default": "mdi:counter"},
+      "regeneration_count_since_service": {"default": "mdi:wrench-clock"},
+      "regenerant_saving": {"default": "mdi:leaf"},
+      "commissioning_date": {"default": "mdi:calendar-start"},
+      "nominal_capacity_column_1": {"default": "mdi:cup-water"},
+      "nominal_capacity_column_2": {"default": "mdi:cup-water"},
+      "remaining_capacity_column_1": {"default": "mdi:cup-water"},
+      "remaining_capacity_column_2": {"default": "mdi:cup-water"},
+      "remaining_capacity_percent_column_1": {"default": "mdi:water-percent"},
+      "remaining_capacity_percent_column_2": {"default": "mdi:water-percent"},
+      "total_salt_consumption": {"default": "mdi:shaker-outline"},
+      "software_version": {"default": "mdi:chip"},
+      "software_version_power_electronics": {"default": "mdi:chip"},
+      "software_version_control_panel": {"default": "mdi:monitor-dashboard"}
+    }
+  }
+}
