@@ -5,9 +5,11 @@ from __future__ import annotations
 import glob
 import os
 from typing import Any
+from urllib.parse import urlparse
 
 import voluptuous as vol
 from homeassistant.config_entries import (
+    SOURCE_RECONFIGURE,
     ConfigEntry,
     ConfigFlow,
     ConfigFlowResult,
@@ -43,10 +45,12 @@ from .const import (
     DEFAULT_FAST_POLL_INTERVAL,
     DEFAULT_POLL_INTERVAL,
     DEFAULT_TCP_PORT,
+    DEFAULT_TITLE,
     DOMAIN,
     MAX_POLL_INTERVAL,
     MIN_FAST_POLL_INTERVAL,
     MIN_POLL_INTERVAL,
+    SOCKET_PREFIX,
     SUPPORTED_BAUDRATES,
 )
 from .protocol import QUERY_SPECS, BwtProtocolError
@@ -59,7 +63,7 @@ def _list_serial_ports() -> list[SelectOptionDict]:
         from serial.tools import list_ports
 
         ports = list(list_ports.comports())
-    except (ImportError, OSError):
+    except ImportError, OSError:
         return []
 
     stable_paths = {
@@ -93,7 +97,7 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for the appliance."""
 
     VERSION = 1
-    MINOR_VERSION = 2
+    MINOR_VERSION = 3
 
     def __init__(self) -> None:
         """Initialize flow state."""
@@ -137,6 +141,23 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
         )
 
+    async def _async_finish(
+        self, data: dict[str, Any], title: str
+    ) -> ConfigFlowResult | str:
+        """Validate and store the connection; return an error key on failure."""
+
+        if error := await self._async_validate(data):
+            return error
+        port = data[CONF_SERIAL_PORT]
+        await self.async_set_unique_id(port)
+        if self.source == SOURCE_RECONFIGURE:
+            self._abort_if_unique_id_configured()
+            return self.async_update_reload_and_abort(
+                self._get_reconfigure_entry(), unique_id=port, title=title, data=data
+            )
+        self._abort_if_unique_id_configured()
+        return self.async_create_entry(title=title, data=data)
+
     async def async_step_serial(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -145,17 +166,27 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             user_input = _normalize(user_input)
-            data = {CONF_CONNECTION_TYPE: CONNECTION_SERIAL, **user_input}
-            errors = await self._async_validate(data)
-            if not errors:
-                unique_id = f"serial:{user_input[CONF_SERIAL_PORT]}"
-                await self.async_set_unique_id(unique_id)
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(title="BWT AQA Perla", data=data)
+            data = {
+                CONF_SERIAL_PORT: user_input[CONF_SERIAL_PORT],
+                CONF_BAUDRATE: int(user_input[CONF_BAUDRATE]),
+            }
+            title = (
+                self._get_reconfigure_entry().title
+                if self.source == SOURCE_RECONFIGURE
+                else DEFAULT_TITLE
+            )
+            result = await self._async_finish(data, title)
+            if not isinstance(result, str):
+                return result
+            errors["base"] = result
 
         ports = await self.hass.async_add_executor_job(_list_serial_ports)
         return self.async_show_form(
-            step_id="serial", data_schema=_serial_schema(ports), errors=errors
+            step_id="serial",
+            data_schema=self.add_suggested_values_to_schema(
+                _serial_schema(ports), user_input or self._current_values()
+            ),
+            errors=errors,
         )
 
     async def async_step_tcp(
@@ -166,78 +197,67 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             user_input = _normalize(user_input)
-            data = {CONF_CONNECTION_TYPE: CONNECTION_TCP, **user_input}
-            errors = await self._async_validate(data)
-            if not errors:
-                unique_id = f"tcp:{user_input[CONF_HOST]}:{user_input[CONF_TCP_PORT]}"
-                await self.async_set_unique_id(unique_id)
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(
-                    title=f"BWT AQA Perla ({user_input[CONF_HOST]})", data=data
+            host = user_input[CONF_HOST].strip()
+            port = int(user_input[CONF_TCP_PORT])
+            if not host or "/" in host or ":" in host.strip("[]"):
+                errors["base"] = "invalid_host"
+            else:
+                result = await self._async_finish(
+                    {CONF_SERIAL_PORT: f"{SOCKET_PREFIX}{host}:{port}"},
+                    f"{DEFAULT_TITLE} ({host})",
                 )
+                if not isinstance(result, str):
+                    return result
+                errors["base"] = result
 
         return self.async_show_form(
-            step_id="tcp", data_schema=_tcp_schema(), errors=errors
+            step_id="tcp",
+            data_schema=self.add_suggested_values_to_schema(
+                _tcp_schema(), user_input or self._current_values()
+            ),
+            errors=errors,
         )
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Change the serial port or the TCP host and port of an entry."""
+        """Change the connection of an existing entry."""
 
-        entry = self._get_reconfigure_entry()
-        effective = {**entry.data, **entry.options}
-        is_serial = entry.data[CONF_CONNECTION_TYPE] == CONNECTION_SERIAL
-        errors: dict[str, str] = {}
+        port = self._get_reconfigure_entry().data[CONF_SERIAL_PORT]
+        if port.startswith(SOCKET_PREFIX):
+            return await self.async_step_tcp()
+        return await self.async_step_serial()
 
-        if user_input is not None:
-            user_input = _normalize(user_input)
-            errors = await self._async_validate({**effective, **user_input})
-            if not errors:
-                if is_serial:
-                    unique_id = f"serial:{user_input[CONF_SERIAL_PORT]}"
-                    title = entry.title
-                else:
-                    unique_id = (
-                        f"tcp:{user_input[CONF_HOST]}:{user_input[CONF_TCP_PORT]}"
-                    )
-                    title = f"BWT AQA Perla ({user_input[CONF_HOST]})"
-                await self.async_set_unique_id(unique_id)
-                self._abort_if_unique_id_configured()
-                return self.async_update_reload_and_abort(
-                    entry, unique_id=unique_id, title=title, data_updates=user_input
-                )
+    def _current_values(self) -> dict[str, Any] | None:
+        """Return form values of the entry being reconfigured, if any."""
 
-        if is_serial:
-            ports = await self.hass.async_add_executor_job(_list_serial_ports)
-            schema = vol.Schema(
-                {vol.Required(CONF_SERIAL_PORT): _serial_port_selector(ports)}
-            )
-        else:
-            schema = _tcp_connection_schema()
-        return self.async_show_form(
-            step_id="reconfigure",
-            data_schema=self.add_suggested_values_to_schema(
-                schema, user_input or effective
-            ),
-            errors=errors,
-        )
+        if self.source != SOURCE_RECONFIGURE:
+            return None
+        data = self._get_reconfigure_entry().data
+        port = data[CONF_SERIAL_PORT]
+        if port.startswith(SOCKET_PREFIX):
+            url = urlparse(port)
+            return {CONF_HOST: url.hostname, CONF_TCP_PORT: url.port}
+        return {
+            CONF_SERIAL_PORT: port,
+            CONF_BAUDRATE: str(data.get(CONF_BAUDRATE, DEFAULT_BAUDRATE)),
+        }
 
-    async def _async_validate(self, data: dict[str, Any]) -> dict[str, str]:
+    async def _async_validate(self, data: dict[str, Any]) -> str | None:
         """Connect and read one documented value before saving."""
 
         client = create_client(data)
         try:
             await client.async_query(_query_spec("water_consumption_24h"))
         except BwtConnectionError:
-            return {"base": "cannot_connect"}
+            return "cannot_connect"
         except BwtProtocolError:
-            return {"base": "invalid_response"}
+            return "invalid_response"
         except Exception:  # noqa: BLE001 - serial backends may raise platform errors
-            return {"base": "unknown"}
+            return "unknown"
         finally:
             await client.async_close()
-        return {}
+        return None
 
 
 def _interval_selector(minimum: int) -> NumberSelector:
@@ -254,22 +274,6 @@ def _interval_selector(minimum: int) -> NumberSelector:
     )
 
 
-def _poll_interval_fields(
-    poll_interval: int = DEFAULT_POLL_INTERVAL,
-    fast_poll_interval: int = DEFAULT_FAST_POLL_INTERVAL,
-) -> dict:
-    """Return the common polling interval schema fields."""
-
-    return {
-        vol.Optional(CONF_POLL_INTERVAL, default=poll_interval): _interval_selector(
-            MIN_POLL_INTERVAL
-        ),
-        vol.Optional(
-            CONF_FAST_POLL_INTERVAL, default=fast_poll_interval
-        ): _interval_selector(MIN_FAST_POLL_INTERVAL),
-    }
-
-
 def _serial_port_selector(ports: list[SelectOptionDict]) -> Any:
     """Return a port dropdown that also accepts a manually typed path."""
 
@@ -280,19 +284,6 @@ def _serial_port_selector(ports: list[SelectOptionDict]) -> Any:
             options=ports, custom_value=True, mode=SelectSelectorMode.DROPDOWN
         )
     )
-
-
-def _serial_schema(ports: list[SelectOptionDict]) -> vol.Schema:
-    """Return the direct-serial form schema."""
-
-    fields: dict = {
-        vol.Required(CONF_SERIAL_PORT): _serial_port_selector(ports),
-        vol.Optional(
-            CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)
-        ): _baudrate_selector(),
-    }
-    fields.update(_poll_interval_fields())
-    return vol.Schema(fields)
 
 
 def _baudrate_selector() -> SelectSelector:
@@ -306,8 +297,21 @@ def _baudrate_selector() -> SelectSelector:
     )
 
 
-def _tcp_connection_schema() -> vol.Schema:
-    """Return the host and port fields of the TCP form."""
+def _serial_schema(ports: list[SelectOptionDict]) -> vol.Schema:
+    """Return the direct-serial form schema."""
+
+    return vol.Schema(
+        {
+            vol.Required(CONF_SERIAL_PORT): _serial_port_selector(ports),
+            vol.Optional(
+                CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)
+            ): _baudrate_selector(),
+        }
+    )
+
+
+def _tcp_schema() -> vol.Schema:
+    """Return the TCP form schema."""
 
     return vol.Schema(
         {
@@ -323,14 +327,8 @@ def _tcp_connection_schema() -> vol.Schema:
     )
 
 
-def _tcp_schema() -> vol.Schema:
-    """Return the TCP form schema."""
-
-    return _tcp_connection_schema().extend(_poll_interval_fields())
-
-
 class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
-    """Allow changing communication and polling options after setup."""
+    """Allow changing the polling intervals after setup."""
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -340,19 +338,25 @@ class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
         if user_input is not None:
             return self.async_create_entry(data=_normalize(user_input))
 
-        effective = {**self.config_entry.data, **self.config_entry.options}
-        fields: dict = {}
-        if effective[CONF_CONNECTION_TYPE] == CONNECTION_SERIAL:
-            fields[
-                vol.Optional(
-                    CONF_BAUDRATE,
-                    default=str(effective.get(CONF_BAUDRATE, DEFAULT_BAUDRATE)),
-                )
-            ] = _baudrate_selector()
-        fields.update(
-            _poll_interval_fields(
-                int(effective.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)),
-                int(effective.get(CONF_FAST_POLL_INTERVAL, DEFAULT_FAST_POLL_INTERVAL)),
-            )
+        options = self.config_entry.options
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_POLL_INTERVAL,
+                        default=int(
+                            options.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)
+                        ),
+                    ): _interval_selector(MIN_POLL_INTERVAL),
+                    vol.Optional(
+                        CONF_FAST_POLL_INTERVAL,
+                        default=int(
+                            options.get(
+                                CONF_FAST_POLL_INTERVAL, DEFAULT_FAST_POLL_INTERVAL
+                            )
+                        ),
+                    ): _interval_selector(MIN_FAST_POLL_INTERVAL),
+                }
+            ),
         )
-        return self.async_show_form(step_id="init", data_schema=vol.Schema(fields))

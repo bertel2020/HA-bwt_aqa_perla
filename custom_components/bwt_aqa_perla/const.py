@@ -7,6 +7,7 @@ from homeassistant.const import Platform
 DOMAIN: Final = "bwt_aqa_perla"
 PLATFORMS: Final = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
+# Legacy keys of entries created before the single-URL data model.
 CONF_CONNECTION_TYPE: Final = "connection_type"
 CONF_SERIAL_PORT: Final = "serial_port"
 CONF_BAUDRATE: Final = "baudrate"
@@ -16,6 +17,9 @@ CONF_FAST_POLL_INTERVAL: Final = "fast_poll_interval"
 
 CONNECTION_SERIAL: Final = "serial"
 CONNECTION_TCP: Final = "tcp"
+
+# A raw TCP bridge is stored as "socket://host:port" in CONF_SERIAL_PORT.
+SOCKET_PREFIX: Final = "socket://"
 
 DEFAULT_BAUDRATE: Final = 9600
 SUPPORTED_BAUDRATES: Final = (1200, 2400, 4800, 9600, 19200, 38400, 56000)
@@ -28,3 +32,4 @@ MAX_POLL_INTERVAL: Final = 3600
 
 MANUFACTURER: Final = "BWT"
 MODEL: Final = "AQA Perla"
+DEFAULT_TITLE: Final = "BWT AQA Perla"

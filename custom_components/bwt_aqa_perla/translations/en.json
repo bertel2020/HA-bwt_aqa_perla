@@ -5,58 +5,69 @@
       "user": {
         "title": "Select connection",
         "description": "Choose how Home Assistant is connected to the BWT AQA Perla.",
-        "data": {"connection_type": "Connection type"}
+        "data": {
+          "connection_type": "Connection type"
+        }
       },
       "serial": {
         "title": "Direct serial connection",
-        "data": {"serial_port": "Serial port", "baudrate": "Baud rate", "poll_interval": "Polling interval", "fast_poll_interval": "Regeneration polling interval"},
+        "data": {
+          "serial_port": "Serial port",
+          "baudrate": "Baud rate"
+        },
         "data_description": {
           "serial_port": "Select a detected port or enter a path. Stable paths such as /dev/serial/by-id/... are preferred.",
-          "baudrate": "The existing setup uses 9600 baud; SoftControl uses a fixed 19200 baud. Use the setting of the actual appliance.",
-          "poll_interval": "Time between complete polls; at least 30 seconds.",
-          "fast_poll_interval": "Time between reads of the regeneration step; at least 5 seconds."
+          "baudrate": "The existing setup uses 9600 baud; SoftControl uses a fixed 19200 baud. Use the setting of the actual appliance."
         }
       },
       "tcp": {
         "title": "Serial over TCP (ser2net)",
-        "data": {"host": "Host", "tcp_port": "TCP port", "poll_interval": "Polling interval", "fast_poll_interval": "Regeneration polling interval"},
-        "data_description": {
-          "host": "IP address or hostname of the machine running ser2net or of the transparent serial TCP bridge.",
-          "tcp_port": "Raw TCP port of the bridge; for ser2net the tcp accepter port (default 8899), not Telnet/RFC2217.",
-          "poll_interval": "Time between complete polls; at least 30 seconds.",
-          "fast_poll_interval": "Time between reads of the regeneration step; at least 5 seconds."
-        }
-      },
-      "reconfigure": {
-        "title": "Change connection",
         "data": {
-          "serial_port": "Serial port",
           "host": "Host",
           "tcp_port": "TCP port"
         },
         "data_description": {
-          "serial_port": "Select a detected port or enter a path.",
-          "host": "IP address or hostname of the bridge or ser2net machine.",
-          "tcp_port": "Raw TCP port of the bridge."
+          "host": "IP address or hostname of the machine running ser2net or of the transparent serial TCP bridge.",
+          "tcp_port": "Raw TCP port of the bridge; for ser2net the tcp accepter port (default 8899), not Telnet/RFC2217."
         }
       }
     },
-    "error": {"cannot_connect": "Failed to connect", "invalid_response": "The device responded with an invalid frame", "unknown": "Unexpected error"},
-    "abort": {"already_configured": "This connection is already configured", "reconfigure_successful": "The connection was changed."}
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_response": "The device responded with an invalid frame",
+      "unknown": "Unexpected error",
+      "invalid_host": "Invalid host"
+    },
+    "abort": {
+      "already_configured": "This connection is already configured",
+      "reconfigure_successful": "The connection was changed."
+    }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Communication options",
-        "description": "For a direct serial connection, changes take effect after the integration reloads automatically. Configure a TCP bridge's baud rate on the bridge itself.",
-        "data": {"baudrate": "Baud rate", "poll_interval": "Polling interval", "fast_poll_interval": "Regeneration polling interval"}
+        "title": "Polling intervals",
+        "description": "Interval for all values except the regeneration step (at least 30 s) and for the regeneration step (at least 5 s). Changes reload the integration automatically. Change port, host and baud rate via “Reconfigure”.",
+        "data": {
+          "poll_interval": "Polling interval",
+          "fast_poll_interval": "Regeneration polling interval"
+        }
       }
     }
   },
-  "selector": {"connection_type": {"options": {"serial": "USB / serial", "tcp": "Serial over TCP (e.g. ser2net)"}}},
+  "selector": {
+    "connection_type": {
+      "options": {
+        "serial": "USB / serial",
+        "tcp": "Serial over TCP (e.g. ser2net)"
+      }
+    }
+  },
   "entity": {
     "binary_sensor": {
-      "regeneration_active": {"name": "Regeneration active"}
+      "regeneration_active": {
+        "name": "Regeneration active"
+      }
     },
     "sensor": {
       "device_type": {
@@ -80,20 +91,48 @@
           "type_15": "Special"
         }
       },
-      "peak_flow_today": {"name": "Peak flow today"},
-      "peak_flow_24h": {"name": "Peak flow 24 h"},
-      "peak_flow_since_commissioning": {"name": "Peak flow since commissioning"},
-      "water_consumption_24h": {"name": "Water consumption 24 h"},
-      "total_water_consumption": {"name": "Total water consumption"},
-      "total_salt_consumption": {"name": "Total salt consumption"},
-      "nominal_capacity_column_1": {"name": "Nominal capacity column 1"},
-      "nominal_capacity_column_2": {"name": "Nominal capacity column 2"},
-      "remaining_capacity_column_1": {"name": "Remaining capacity column 1"},
-      "remaining_capacity_column_2": {"name": "Remaining capacity column 2"},
-      "remaining_capacity_percent_column_1": {"name": "Remaining capacity column 1 (percent)"},
-      "remaining_capacity_percent_column_2": {"name": "Remaining capacity column 2 (percent)"},
-      "regeneration_count": {"name": "Regenerations"},
-      "regeneration_count_since_service": {"name": "Regenerations since service"},
+      "peak_flow_today": {
+        "name": "Peak flow today"
+      },
+      "peak_flow_24h": {
+        "name": "Peak flow 24 h"
+      },
+      "peak_flow_since_commissioning": {
+        "name": "Peak flow since commissioning"
+      },
+      "water_consumption_24h": {
+        "name": "Water consumption 24 h"
+      },
+      "total_water_consumption": {
+        "name": "Total water consumption"
+      },
+      "total_salt_consumption": {
+        "name": "Total salt consumption"
+      },
+      "nominal_capacity_column_1": {
+        "name": "Nominal capacity column 1"
+      },
+      "nominal_capacity_column_2": {
+        "name": "Nominal capacity column 2"
+      },
+      "remaining_capacity_column_1": {
+        "name": "Remaining capacity column 1"
+      },
+      "remaining_capacity_column_2": {
+        "name": "Remaining capacity column 2"
+      },
+      "remaining_capacity_percent_column_1": {
+        "name": "Remaining capacity column 1 (percent)"
+      },
+      "remaining_capacity_percent_column_2": {
+        "name": "Remaining capacity column 2 (percent)"
+      },
+      "regeneration_count": {
+        "name": "Regenerations"
+      },
+      "regeneration_count_since_service": {
+        "name": "Regenerations since service"
+      },
       "regeneration_step": {
         "name": "Regeneration step",
         "state": {
@@ -141,11 +180,21 @@
           "step_41": "T-Brine valve-2"
         }
       },
-      "regenerant_saving": {"name": "Regenerant saving"},
-      "commissioning_date": {"name": "Commissioning date"},
-      "software_version": {"name": "Combined software version"},
-      "software_version_power_electronics": {"name": "Power electronics software version"},
-      "software_version_control_panel": {"name": "Control panel software version"}
+      "regenerant_saving": {
+        "name": "Regenerant saving"
+      },
+      "commissioning_date": {
+        "name": "Commissioning date"
+      },
+      "software_version": {
+        "name": "Combined software version"
+      },
+      "software_version_power_electronics": {
+        "name": "Power electronics software version"
+      },
+      "software_version_control_panel": {
+        "name": "Control panel software version"
+      }
     }
   }
 }

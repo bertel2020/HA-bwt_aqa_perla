@@ -13,50 +13,30 @@
         "title": "Direkte serielle Verbindung",
         "data": {
           "serial_port": "Serieller Port",
-          "baudrate": "Baudrate",
-          "poll_interval": "Abfrageintervall",
-          "fast_poll_interval": "Abfrageintervall Regeneration"
+          "baudrate": "Baudrate"
         },
         "data_description": {
           "serial_port": "Gefundene Ports auswählen oder einen Pfad eintragen. Stabile Pfade wie /dev/serial/by-id/... werden bevorzugt.",
-          "baudrate": "Der vorhandene Aufbau nutzt 9600 Baud; SoftControl verwendet dagegen fest 19200 Baud. Es gilt die Einstellung der konkreten Anlage.",
-          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden.",
-          "fast_poll_interval": "Zeit zwischen Abfragen des Regenerationsschritts; mindestens 5 Sekunden."
+          "baudrate": "Der vorhandene Aufbau nutzt 9600 Baud; SoftControl verwendet dagegen fest 19200 Baud. Es gilt die Einstellung der konkreten Anlage."
         }
       },
       "tcp": {
         "title": "Serial over TCP (ser2net)",
         "data": {
           "host": "Host",
-          "tcp_port": "TCP-Port",
-          "poll_interval": "Abfrageintervall",
-          "fast_poll_interval": "Abfrageintervall Regeneration"
-        },
-        "data_description": {
-          "host": "IP-Adresse oder Hostname des Rechners mit ser2net bzw. der transparenten seriellen TCP-Bridge.",
-          "tcp_port": "Raw-TCP-Port der Bridge, bei ser2net der Port des tcp-Accepters (Standard 8899), nicht Telnet/RFC2217.",
-          "poll_interval": "Zeit zwischen vollständigen Abfragen; mindestens 30 Sekunden.",
-          "fast_poll_interval": "Zeit zwischen Abfragen des Regenerationsschritts; mindestens 5 Sekunden."
-        }
-      },
-      "reconfigure": {
-        "title": "Verbindung ändern",
-        "data": {
-          "serial_port": "Serieller Port",
-          "host": "Host",
           "tcp_port": "TCP-Port"
         },
         "data_description": {
-          "serial_port": "Gefundenen Port auswählen oder einen Pfad eintragen.",
-          "host": "IP-Adresse oder Hostname der Bridge bzw. des ser2net-Rechners.",
-          "tcp_port": "Raw-TCP-Port der Bridge."
+          "host": "IP-Adresse oder Hostname des Rechners mit ser2net bzw. der transparenten seriellen TCP-Bridge.",
+          "tcp_port": "Raw-TCP-Port der Bridge, bei ser2net der Port des tcp-Accepters (Standard 8899), nicht Telnet/RFC2217."
         }
       }
     },
     "error": {
       "cannot_connect": "Verbindung fehlgeschlagen",
       "invalid_response": "Das Gerät antwortet, aber das Telegramm ist ungültig",
-      "unknown": "Unerwarteter Fehler"
+      "unknown": "Unerwarteter Fehler",
+      "invalid_host": "Ungültiger Host"
     },
     "abort": {
       "already_configured": "Diese Verbindung ist bereits konfiguriert",
@@ -66,10 +46,9 @@
   "options": {
     "step": {
       "init": {
-        "title": "Kommunikationsoptionen",
-        "description": "Bei direkter serieller Verbindung werden Änderungen nach dem Speichern durch einen automatischen Neustart der Integration wirksam. Die Baudrate einer TCP-Bridge muss an der Bridge selbst eingestellt werden.",
+        "title": "Abfrageintervalle",
+        "description": "Intervall für alle Werte außer dem Regenerationsschritt (mindestens 30 s) und für den Regenerationsschritt (mindestens 5 s). Änderungen laden die Integration automatisch neu. Port, Host und Baudrate ändert man über „Neu konfigurieren“.",
         "data": {
-          "baudrate": "Baudrate",
           "poll_interval": "Abfrageintervall",
           "fast_poll_interval": "Abfrageintervall Regeneration"
         }
@@ -86,7 +65,9 @@
   },
   "entity": {
     "binary_sensor": {
-      "regeneration_active": {"name": "Regeneration aktiv"}
+      "regeneration_active": {
+        "name": "Regeneration aktiv"
+      }
     },
     "sensor": {
       "device_type": {
@@ -110,20 +91,48 @@
           "type_15": "Special"
         }
       },
-      "peak_flow_today": {"name": "Spitzendurchfluss heute"},
-      "peak_flow_24h": {"name": "Spitzendurchfluss 24 h"},
-      "peak_flow_since_commissioning": {"name": "Spitzendurchfluss seit Inbetriebnahme"},
-      "water_consumption_24h": {"name": "Wasserverbrauch 24 h"},
-      "total_water_consumption": {"name": "Wasserverbrauch gesamt"},
-      "total_salt_consumption": {"name": "Salzverbrauch gesamt"},
-      "nominal_capacity_column_1": {"name": "Sollkapazität Säule 1"},
-      "nominal_capacity_column_2": {"name": "Sollkapazität Säule 2"},
-      "remaining_capacity_column_1": {"name": "Restkapazität Säule 1"},
-      "remaining_capacity_column_2": {"name": "Restkapazität Säule 2"},
-      "remaining_capacity_percent_column_1": {"name": "Restkapazität Säule 1 (Prozent)"},
-      "remaining_capacity_percent_column_2": {"name": "Restkapazität Säule 2 (Prozent)"},
-      "regeneration_count": {"name": "Regenerationen"},
-      "regeneration_count_since_service": {"name": "Regenerationen seit Service"},
+      "peak_flow_today": {
+        "name": "Spitzendurchfluss heute"
+      },
+      "peak_flow_24h": {
+        "name": "Spitzendurchfluss 24 h"
+      },
+      "peak_flow_since_commissioning": {
+        "name": "Spitzendurchfluss seit Inbetriebnahme"
+      },
+      "water_consumption_24h": {
+        "name": "Wasserverbrauch 24 h"
+      },
+      "total_water_consumption": {
+        "name": "Wasserverbrauch gesamt"
+      },
+      "total_salt_consumption": {
+        "name": "Salzverbrauch gesamt"
+      },
+      "nominal_capacity_column_1": {
+        "name": "Sollkapazität Säule 1"
+      },
+      "nominal_capacity_column_2": {
+        "name": "Sollkapazität Säule 2"
+      },
+      "remaining_capacity_column_1": {
+        "name": "Restkapazität Säule 1"
+      },
+      "remaining_capacity_column_2": {
+        "name": "Restkapazität Säule 2"
+      },
+      "remaining_capacity_percent_column_1": {
+        "name": "Restkapazität Säule 1 (Prozent)"
+      },
+      "remaining_capacity_percent_column_2": {
+        "name": "Restkapazität Säule 2 (Prozent)"
+      },
+      "regeneration_count": {
+        "name": "Regenerationen"
+      },
+      "regeneration_count_since_service": {
+        "name": "Regenerationen seit Service"
+      },
       "regeneration_step": {
         "name": "Regenerationsschritt",
         "state": {
@@ -171,11 +180,21 @@
           "step_41": "T-Soleventil-2"
         }
       },
-      "regenerant_saving": {"name": "Regeneriermitteleinsparung"},
-      "commissioning_date": {"name": "Inbetriebnahmedatum"},
-      "software_version": {"name": "Softwareversion kombiniert"},
-      "software_version_power_electronics": {"name": "Softwareversion Leistungselektronik"},
-      "software_version_control_panel": {"name": "Softwareversion Bedienteil"}
+      "regenerant_saving": {
+        "name": "Regeneriermitteleinsparung"
+      },
+      "commissioning_date": {
+        "name": "Inbetriebnahmedatum"
+      },
+      "software_version": {
+        "name": "Softwareversion kombiniert"
+      },
+      "software_version_power_electronics": {
+        "name": "Softwareversion Leistungselektronik"
+      },
+      "software_version_control_panel": {
+        "name": "Softwareversion Bedienteil"
+      }
     }
   }
 }

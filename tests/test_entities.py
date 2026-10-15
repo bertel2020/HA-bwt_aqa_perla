@@ -115,7 +115,7 @@ async def test_diagnostics_redacts_target(
     await _setup(hass, tcp_entry)
     result = await async_get_config_entry_diagnostics(hass, tcp_entry)
 
-    assert result["entry"]["data"]["host"] == "**REDACTED**"
+    assert result["entry"]["data"]["serial_port"] == "**REDACTED**"
     assert result["last_update_success"] is True
     assert result["values"]["total_water_consumption"] == 5000
     assert result["last_frames"] == {"0x08": "0D 08 02 78 00 8F 0A"}

@@ -103,7 +103,7 @@ class BwtAqaPerlaClient:
         writer.close()
         try:
             await writer.wait_closed()
-        except (OSError, RuntimeError):
+        except OSError, RuntimeError:
             pass
 
     async def _async_read_frame(self, command: int, echo: bytes) -> bytes:

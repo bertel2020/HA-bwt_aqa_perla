@@ -9,12 +9,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bwt_aqa_perla.client import BwtConnectionError
-from custom_components.bwt_aqa_perla.const import (
-    CONF_CONNECTION_TYPE,
-    CONF_TCP_PORT,
-    CONNECTION_TCP,
-    DOMAIN,
-)
+from custom_components.bwt_aqa_perla.const import CONF_SERIAL_PORT, DOMAIN
 
 VALUES = {
     "device_type": 12,
@@ -83,10 +78,8 @@ def tcp_entry() -> MockConfigEntry:
     return MockConfigEntry(
         domain=DOMAIN,
         title="BWT AQA Perla (192.0.2.10)",
-        unique_id="tcp:192.0.2.10:8899",
-        data={
-            CONF_CONNECTION_TYPE: CONNECTION_TCP,
-            "host": "192.0.2.10",
-            CONF_TCP_PORT: 8899,
-        },
+        unique_id="socket://192.0.2.10:8899",
+        version=1,
+        minor_version=3,
+        data={CONF_SERIAL_PORT: "socket://192.0.2.10:8899"},
     )
