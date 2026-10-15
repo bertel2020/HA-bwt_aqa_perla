@@ -17,6 +17,7 @@ from .const import (
     CONF_SERIAL_PORT,
     CONF_TCP_PORT,
     CONNECTION_SERIAL,
+    CONNECTION_TCP,
     DEFAULT_FAST_POLL_INTERVAL,
     DEFAULT_POLL_INTERVAL,
     PLATFORMS,
@@ -59,6 +60,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: BwtAqaPerlaConfigEntry) 
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = BwtAqaPerlaRuntimeData(client, coordinator)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Drop the ".0" that number selectors left in TCP unique IDs (1.1 -> 1.2).
+
+    The stored port stays as is: 8899.0 equals 8899, and it is cast to int
+    wherever it is used.
+    """
+
+    if entry.version == 1 and entry.minor_version < 2:
+        unique_id = entry.unique_id
+        if entry.data.get(CONF_CONNECTION_TYPE) == CONNECTION_TCP:
+            unique_id = f"tcp:{entry.data[CONF_HOST]}:{int(entry.data[CONF_TCP_PORT])}"
+        hass.config_entries.async_update_entry(
+            entry, unique_id=unique_id, minor_version=2
+        )
     return True
 
 

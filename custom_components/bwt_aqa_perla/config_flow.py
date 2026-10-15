@@ -74,6 +74,15 @@ def _list_serial_ports() -> list[SelectOptionDict]:
     return options
 
 
+def _normalize(user_input: dict[str, Any]) -> dict[str, Any]:
+    """Store whole-number selector values as integers instead of floats."""
+
+    return {
+        key: int(value) if isinstance(value, float) and value.is_integer() else value
+        for key, value in user_input.items()
+    }
+
+
 def _query_spec(key: str):
     """Return one query definition by key."""
 
@@ -84,6 +93,7 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for the appliance."""
 
     VERSION = 1
+    MINOR_VERSION = 2
 
     def __init__(self) -> None:
         """Initialize flow state."""
@@ -134,6 +144,7 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
 
         errors: dict[str, str] = {}
         if user_input is not None:
+            user_input = _normalize(user_input)
             data = {CONF_CONNECTION_TYPE: CONNECTION_SERIAL, **user_input}
             errors = await self._async_validate(data)
             if not errors:
@@ -154,6 +165,7 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
 
         errors: dict[str, str] = {}
         if user_input is not None:
+            user_input = _normalize(user_input)
             data = {CONF_CONNECTION_TYPE: CONNECTION_TCP, **user_input}
             errors = await self._async_validate(data)
             if not errors:
@@ -179,6 +191,7 @@ class BwtAqaPerlaConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            user_input = _normalize(user_input)
             errors = await self._async_validate({**effective, **user_input})
             if not errors:
                 if is_serial:
@@ -325,7 +338,7 @@ class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
         """Manage integration options."""
 
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
+            return self.async_create_entry(data=_normalize(user_input))
 
         effective = {**self.config_entry.data, **self.config_entry.options}
         fields: dict = {}
