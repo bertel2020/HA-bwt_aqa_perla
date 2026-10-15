@@ -8,7 +8,12 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import EntityCategory, UnitOfMass, UnitOfVolume
+from homeassistant.const import (
+    EntityCategory,
+    UnitOfMass,
+    UnitOfVolume,
+    UnitOfVolumeFlowRate,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -28,27 +33,29 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         key="peak_flow_today",
         translation_key="peak_flow_today",
-        native_unit_of_measurement="L/h",
+        native_unit_of_measurement=UnitOfVolumeFlowRate.LITERS_PER_HOUR,
+        device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="peak_flow_24h",
         translation_key="peak_flow_24h",
-        native_unit_of_measurement="L/h",
+        native_unit_of_measurement=UnitOfVolumeFlowRate.LITERS_PER_HOUR,
+        device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="peak_flow_since_commissioning",
         translation_key="peak_flow_since_commissioning",
-        native_unit_of_measurement="L/h",
+        native_unit_of_measurement=UnitOfVolumeFlowRate.LITERS_PER_HOUR,
+        device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="water_consumption_24h",
         translation_key="water_consumption_24h",
         native_unit_of_measurement=UnitOfVolume.LITERS,
-        device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="total_water_consumption",
@@ -69,28 +76,24 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         key="nominal_capacity_column_1",
         translation_key="nominal_capacity_column_1",
         native_unit_of_measurement=UnitOfVolume.LITERS,
-        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="nominal_capacity_column_2",
         translation_key="nominal_capacity_column_2",
         native_unit_of_measurement=UnitOfVolume.LITERS,
-        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="remaining_capacity_column_1",
         translation_key="remaining_capacity_column_1",
         native_unit_of_measurement=UnitOfVolume.LITERS,
-        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="remaining_capacity_column_2",
         translation_key="remaining_capacity_column_2",
         native_unit_of_measurement=UnitOfVolume.LITERS,
-        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
