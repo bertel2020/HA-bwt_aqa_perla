@@ -103,25 +103,30 @@ class BwtAqaPerlaClient:
         except (OSError, RuntimeError):
             pass
 
-    async def _async_read_frame(self) -> bytes:
-        """Read exactly one length-framed response, resynchronizing on 0x0D."""
+    async def _async_read_frame(self, echo: bytes | None = None) -> bytes:
+        """Read one length-framed response, resynchronizing on 0x0D.
+
+        Adapters that echo transmitted bytes return the query first; such a
+        frame is skipped instead of being treated as the response.
+        """
 
         assert self._reader is not None
         reader = self._reader
 
         while True:
             first = await reader.readexactly(1)
-            if first[0] == START_BYTE:
-                break
-            _LOGGER.debug("Discarding byte 0x%02X before frame", first[0])
-
-        header_tail = await reader.readexactly(2)
-        payload_length = header_tail[1]
-        remainder = await reader.readexactly(payload_length + 2)
-        frame = bytes((START_BYTE,)) + header_tail + remainder
-        if frame[-1] != END_BYTE:
-            raise BwtProtocolError("Frame has no end marker")
-        return frame
+            if first[0] != START_BYTE:
+                _LOGGER.debug("Discarding byte 0x%02X before frame", first[0])
+                continue
+            header_tail = await reader.readexactly(2)
+            remainder = await reader.readexactly(header_tail[1] + 2)
+            frame = first + header_tail + remainder
+            if frame[-1] != END_BYTE:
+                raise BwtProtocolError("Frame has no end marker")
+            if frame == echo:
+                _LOGGER.debug("Ignoring echoed query")
+                continue
+            return frame
 
     async def async_query(self, spec: QuerySpec) -> int | float | str:
         """Query and decode one register."""
@@ -135,7 +140,7 @@ class BwtAqaPerlaClient:
                 self._writer.write(query)
                 await self._writer.drain()
                 async with asyncio.timeout(self._response_timeout):
-                    frame = await self._async_read_frame()
+                    frame = await self._async_read_frame(query)
                 _LOGGER.debug("RX: %s", frame.hex(" ").upper())
                 payload = parse_frame(frame, spec.command)
                 return decode_value(payload, spec)
