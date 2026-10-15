@@ -67,14 +67,14 @@ Copy the `custom_components/bwt_aqa_perla` directory to `/config/custom_componen
 
 Settings → Devices & services → Add integration → **BWT AQA Perla**. Before saving, the wizard test-reads the 24 h consumption.
 
-1. Choose **USB / serial** or **Serial over TCP**.
-   - USB / serial: port, baud rate (default `9600`).
-   - Serial over TCP: host/IP and raw TCP port (default `8899`).
-2. Set the polling intervals (default 60 s, and 15 s for the regeneration step).
+1. Choose **USB / serial** or **Network (ser2net / TCP)** in the menu.
+   - USB / serial: pick the port from the list, baud rate (default `9600`).
+   - Network: host/IP and raw TCP port (default `8899`).
+2. The polling intervals (default 60 s, and 15 s for the regeneration step) can be changed afterwards via **Configure**.
 
 ### USB / serial
 
-The wizard offers detected serial ports as a dropdown (stable `/dev/serial/by-id/...` paths first); a custom path can still be typed in. Prefer a stable path over `/dev/ttyUSB0`. With Home Assistant Container the USB device must be passed through to the container.
+The wizard uses Home Assistant's serial port picker (the `usb` integration is loaded automatically). Prefer a stable `/dev/serial/by-id/...` path over `/dev/ttyUSB0`. With Home Assistant Container the USB device must be passed through to the container.
 
 The appliance usually uses `9600 baud, 8 data bits, no parity, 1 stop bit` (`9600 8N1`); this is the integration's default. Other units may use 19200 baud – the actual setting of your appliance is what counts.
 
@@ -99,7 +99,7 @@ For ser2net 3.x the corresponding line in `/etc/ser2net.conf` is:
 8899:raw:0:/dev/serial/by-id/usb-XXXX:9600 8DATABITS NONE 1STOPBIT
 ```
 
-In the integration choose **Serial over TCP**, enter the machine's host and port `8899`. The baud rate (`9600n81`) is set only in ser2net. The `tcp` accepter is raw; **do not** use `telnet(rfc2217)` or `telnet`.
+In the integration choose **Network (ser2net / TCP)**, enter the machine's host and port `8899`. The baud rate (`9600n81`) is set only in ser2net. The `tcp` accepter is raw; **do not** use `telnet(rfc2217)` or `telnet`.
 
 ## Configuration (options)
 
@@ -109,9 +109,10 @@ Via the integration's **Configure** button:
 |---|---:|---|---|
 | Polling interval | 60 s | 30–3600 s | Interval for all values except the regeneration step |
 | Regeneration polling interval | 15 s | 5–3600 s | Interval for the regeneration step |
-| Baud rate | 9600 | 1200–56000 | direct serial connection only |
 
-With serial over TCP the baud rate must be set on the bridge itself. Change the serial port, or host and TCP port, through the integration's menu (⋮) under **Reconfigure** without re-adding the integration. Changes reload the integration automatically.
+Changes reload the integration automatically.
+
+**Changing the connection:** port and baud rate, or host and TCP port (even the connection type, e.g. from USB to network), are changed through the integration's menu (⋮) under **Reconfigure** without re-adding the integration. With ser2net and other bridges the baud rate is set on the bridge itself.
 
 ## Entities
 
@@ -142,6 +143,8 @@ The entity ID is built from device name + entity name (Home Assistant's default 
 | Commissioning date | `sensor.bwt_aqa_perla_commissioning_date` | `0x15` | Commissioning date; diagnostic, optional |
 | Power electronics software version | `sensor.bwt_aqa_perla_power_electronics_software_version` | `0x19` | Power electronics version, e.g. `3.94`; diagnostic |
 | Control panel software version | `sensor.bwt_aqa_perla_control_panel_software_version` | `0x19` | Control panel version, e.g. `155`; diagnostic |
+| Last successful poll | `sensor.bwt_aqa_perla_last_successful_poll` | – | Time of the last successful poll; diagnostic, stays available during an outage |
+| Failed polls | `sensor.bwt_aqa_perla_failed_polls` | – | Number of failed polls since start; diagnostic |
 | Combined software version | `sensor.bwt_aqa_perla_combined_software_version` | `0x19` | Combined response, e.g. `3.94#155`; diagnostic, disabled by default |
 
 The states of **Device type** and **Regeneration step** are keys (`type_12`, `step_0`); the UI shows the translated label. Automations should therefore compare against these keys or use the “Regeneration active” binary sensor.
@@ -188,6 +191,8 @@ automation:
 **Connection fails.** Check host, port and baud rate. With ser2net the accepter must be `tcp` (raw), not `telnet`. For USB check that the device reaches the container and Home Assistant can access the port.
 
 **Individual sensors are missing.** Optional values are only created when the appliance answers them.
+
+**Repair “No data from the BWT AQA Perla”.** It appears under **Settings → Repairs** when no poll has succeeded for over 10 minutes and disappears on its own once data arrives again. The diagnostic sensors “Last successful poll” and “Failed polls” show how stable the connection is.
 
 **Debug logging.** Enable in `configuration.yaml`:
 

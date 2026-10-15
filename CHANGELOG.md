@@ -6,6 +6,26 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Versionen folgen dem Feld `version` in
 `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unveröffentlicht
+
+### Achtung beim Update
+
+- **Home Assistant 2026.10 oder neuer** ist erforderlich (Portauswahl von Home Assistant).
+- Die Verbindung wird jetzt als ein Wert gespeichert (`serial_port`, bei TCP als `socket://host:port`); die Unique-ID ist die Verbindung selbst. Bestehende Einträge werden automatisch migriert. Die Baudrate gehört jetzt zur Verbindung und wird über **Neu konfigurieren** geändert; die Optionen enthalten nur noch die Abfrageintervalle.
+- Die Integration hängt von `usb` ab (wird automatisch geladen).
+
+### Neu
+
+- Einrichtung und Neukonfiguration beginnen mit einem Menü **USB / seriell** oder **Netzwerk (ser2net / TCP)**; die Verbindungsart lässt sich nachträglich wechseln.
+- Auswahl des seriellen Ports über die Portauswahl von Home Assistant.
+- Diagnosesensoren „Letzte erfolgreiche Abfrage“ und „Fehlgeschlagene Abfragen“.
+- Reparaturhinweis, wenn seit über 10 Minuten keine Abfrage erfolgreich war.
+- Das Gerät kann in der Oberfläche entfernt werden.
+
+### Intern
+
+- Tests und CI laufen mit Python 3.14 und Home Assistant 2026.10.
+
 ## 1.0.0 – 2026-10-15
 
 ### Achtung beim Update

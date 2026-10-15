@@ -67,14 +67,14 @@ Das Verzeichnis `custom_components/bwt_aqa_perla` nach `/config/custom_component
 
 Einstellungen → Geräte & Dienste → Integration hinzufügen → **BWT AQA Perla**. Der Assistent liest vor dem Speichern testweise den 24-h-Verbrauch.
 
-1. **USB / seriell** oder **Serial over TCP** wählen.
-   - USB / seriell: Port, Baudrate (Standard `9600`).
-   - Serial over TCP: Host/IP und Raw-TCP-Port (Standard `8899`).
-2. Abfrageintervalle festlegen (Standard 60 s und 15 s für den Regenerationsschritt).
+1. Im Menü **USB / seriell** oder **Netzwerk (ser2net / TCP)** wählen.
+   - USB / seriell: Port aus der Liste wählen, Baudrate (Standard `9600`).
+   - Netzwerk: Host/IP und Raw-TCP-Port (Standard `8899`).
+2. Die Abfrageintervalle (Standard 60 s und 15 s für den Regenerationsschritt) lassen sich danach über **Konfigurieren** ändern.
 
 ### USB / seriell
 
-Im Assistenten werden erkannte serielle Ports als Auswahl angeboten (stabile `/dev/serial/by-id/...`-Pfade zuerst); ein eigener Pfad kann weiterhin eingetragen werden. Nach Möglichkeit sollte ein stabiler Pfad statt `/dev/ttyUSB0` verwendet werden. Bei Home Assistant Container muss das USB-Gerät in den Container durchgereicht sein.
+Der Assistent verwendet die Portauswahl von Home Assistant (die `usb`-Integration wird automatisch mitgeladen). Nach Möglichkeit sollte ein stabiler Pfad `/dev/serial/by-id/...` statt `/dev/ttyUSB0` gewählt werden. Bei Home Assistant Container muss das USB-Gerät in den Container durchgereicht sein.
 
 Die Anlage verwendet in der Regel `9600 Baud, 8 Datenbits, keine Parität, 1 Stoppbit` (`9600 8N1`); das ist die Vorgabe der Integration. Abweichende Geräte können 19200 Baud verwenden – maßgeblich ist die Konfiguration der konkreten Anlage.
 
@@ -99,7 +99,7 @@ Bei ser2net 3.x lautet die entsprechende Zeile in `/etc/ser2net.conf`:
 8899:raw:0:/dev/serial/by-id/usb-XXXX:9600 8DATABITS NONE 1STOPBIT
 ```
 
-In der Integration **Serial over TCP** wählen, den Host des Rechners und den Port `8899` eintragen. Die Baudrate (`9600n81`) wird ausschließlich in ser2net eingestellt. Der Accepter `tcp` ist roh; `telnet(rfc2217)` oder `telnet` dürfen **nicht** verwendet werden.
+In der Integration **Netzwerk (ser2net / TCP)** wählen, den Host des Rechners und den Port `8899` eintragen. Die Baudrate (`9600n81`) wird ausschließlich in ser2net eingestellt. Der Accepter `tcp` ist roh; `telnet(rfc2217)` oder `telnet` dürfen **nicht** verwendet werden.
 
 ## Konfiguration (Optionen)
 
@@ -109,9 +109,10 @@ In der Integration **Serial over TCP** wählen, den Host des Rechners und den Po
 |---|---:|---|---|
 | Abfrageintervall | 60 s | 30–3600 s | Intervall für alle Werte außer dem Regenerationsschritt |
 | Abfrageintervall Regeneration | 15 s | 5–3600 s | Intervall für den Regenerationsschritt |
-| Baudrate | 9600 | 1200–56000 | nur bei direkter serieller Verbindung |
 
-Bei Serial over TCP muss die Baudrate direkt an der Bridge eingestellt werden. Seriellen Port bzw. Host und TCP-Port ändert man über das Menü der Integration (⋮) unter **Neu konfigurieren**, ohne die Integration neu anzulegen. Änderungen laden die Integration automatisch neu.
+Änderungen laden die Integration automatisch neu.
+
+**Verbindung ändern:** Port und Baudrate bzw. Host und TCP-Port (auch die Verbindungsart, z. B. von USB auf Netzwerk) ändert man über das Menü der Integration (⋮) unter **Neu konfigurieren**, ohne die Integration neu anzulegen. Bei ser2net und anderen Bridges wird die Baudrate an der Bridge selbst eingestellt.
 
 ## Entities
 
@@ -142,6 +143,8 @@ Die Entity-ID entsteht aus Gerätename + Entity-Name (Home Assistants Standard-S
 | Inbetriebnahmedatum | `sensor.bwt_aqa_perla_inbetriebnahmedatum` | `0x15` | Inbetriebnahmedatum; Diagnose, optional |
 | Softwareversion Leistungselektronik | `sensor.bwt_aqa_perla_softwareversion_leistungselektronik` | `0x19` | Version der Leistungselektronik, z. B. `3.94`; Diagnose |
 | Softwareversion Bedienteil | `sensor.bwt_aqa_perla_softwareversion_bedienteil` | `0x19` | Version des Bedienteils, z. B. `155`; Diagnose |
+| Letzte erfolgreiche Abfrage | `sensor.bwt_aqa_perla_letzte_erfolgreiche_abfrage` | – | Zeitpunkt der letzten erfolgreichen Abfrage; Diagnose, bleibt auch bei Ausfall verfügbar |
+| Fehlgeschlagene Abfragen | `sensor.bwt_aqa_perla_fehlgeschlagene_abfragen` | – | Anzahl fehlgeschlagener Abfragen seit dem Start; Diagnose |
 | Softwareversion kombiniert | `sensor.bwt_aqa_perla_softwareversion_kombiniert` | `0x19` | Kombinierte Antwort, z. B. `3.94#155`; Diagnose, standardmäßig deaktiviert |
 
 Die Zustände von **Gerätetyp** und **Regenerationsschritt** sind Schlüssel (`type_12`, `step_0`), die Oberfläche zeigt die übersetzte Bezeichnung. Automationen sollten deshalb auf diese Schlüssel prüfen oder den Binärsensor „Regeneration aktiv“ verwenden.
@@ -188,6 +191,8 @@ automation:
 **Verbindung schlägt fehl.** Host, Port und Baudrate prüfen. Bei ser2net muss der Accepter `tcp` (roh) sein, nicht `telnet`. Bei USB prüfen, ob das Gerät im Container ankommt und Home Assistant Zugriff auf den Port hat.
 
 **Einzelne Sensoren fehlen.** Optionale Werte werden nur angelegt, wenn die Anlage sie beantwortet.
+
+**Hinweis „Keine Daten von der BWT AQA Perla“.** Er erscheint unter **Einstellungen → Reparaturen**, wenn seit über 10 Minuten keine Abfrage erfolgreich war, und verschwindet von selbst, sobald wieder Daten ankommen. Die Diagnosesensoren „Letzte erfolgreiche Abfrage“ und „Fehlgeschlagene Abfragen“ zeigen, wie stabil die Verbindung ist.
 
 **Debug-Protokoll.** In `configuration.yaml` aktivieren:
 

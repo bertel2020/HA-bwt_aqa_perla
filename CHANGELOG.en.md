@@ -5,6 +5,26 @@
 All notable changes to this project are documented here. Versions follow the
 `version` field in `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unreleased
+
+### Breaking changes
+
+- **Home Assistant 2026.10 or newer** is required (Home Assistant's serial port picker).
+- The connection is now stored as a single value (`serial_port`, for TCP as `socket://host:port`); the unique ID is the connection itself. Existing entries are migrated automatically. The baud rate is now part of the connection and changed via **Reconfigure**; the options only contain the polling intervals.
+- The integration depends on `usb` (loaded automatically).
+
+### New
+
+- Setup and reconfiguration start with a menu **USB / serial** or **Network (ser2net / TCP)**; the connection type can be switched later.
+- Serial port selection through Home Assistant's port picker.
+- Diagnostic sensors “Last successful poll” and “Failed polls”.
+- Repair issue when no poll has succeeded for over 10 minutes.
+- The device can be removed from the UI.
+
+### Internal
+
+- Tests and CI run on Python 3.14 and Home Assistant 2026.10.
+
 ## 1.0.0 – 2026-10-15
 
 ### Breaking changes
