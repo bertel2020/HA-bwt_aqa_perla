@@ -4,18 +4,16 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 
 from .protocol import (
     END_BYTE,
-    QUERY_SPECS,
     START_BYTE,
     BwtProtocolError,
     QuerySpec,
     build_query,
     decode_value,
     parse_frame,
-    split_software_version,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,6 +25,10 @@ StreamFactory = Callable[
 
 class BwtConnectionError(Exception):
     """Raised when communication with the device fails."""
+
+
+class BwtConnectError(BwtConnectionError):
+    """Raised when the connection itself cannot be established."""
 
 
 class BwtAqaPerlaClient:
@@ -89,7 +91,7 @@ class BwtAqaPerlaClient:
                 self._reader, self._writer = await self._stream_factory()
         except (TimeoutError, OSError, ValueError) as err:
             await self.async_close()
-            raise BwtConnectionError(f"Unable to connect: {err}") from err
+            raise BwtConnectError(f"Unable to connect: {err}") from err
 
     async def async_close(self) -> None:
         """Close the active connection."""
@@ -160,27 +162,30 @@ class BwtAqaPerlaClient:
                 await self.async_close()
                 raise
 
-    async def async_update(self) -> dict[str, int | float | str]:
-        """Read all known values sequentially."""
+    async def async_read(
+        self, specs: Sequence[QuerySpec]
+    ) -> dict[str, int | float | str]:
+        """Read the given values sequentially.
+
+        A command that fails or is unsupported is left out of the result, so
+        the other values stay usable. An error is raised only when the
+        connection cannot be established or nothing could be read at all.
+        """
 
         values: dict[str, int | float | str] = {}
-        for index, spec in enumerate(QUERY_SPECS):
+        last_error: Exception | None = None
+        for index, spec in enumerate(specs):
             try:
-                value = await self.async_query(spec)
-                values[spec.key] = value
-                if spec.key == "software_version" and isinstance(value, str):
-                    electronics, control_panel = split_software_version(value)
-                    values["software_version_power_electronics"] = electronics
-                    if control_panel is not None:
-                        values["software_version_control_panel"] = control_panel
-            except (BwtConnectionError, BwtProtocolError):
-                if not spec.optional:
-                    raise
+                values[spec.key] = await self.async_query(spec)
+            except BwtConnectError:
+                raise
+            except (BwtConnectionError, BwtProtocolError) as err:
+                last_error = err
                 _LOGGER.debug(
-                    "Optional command 0x%02X is not supported by this device",
-                    spec.command,
-                    exc_info=True,
+                    "Command 0x%02X failed: %s", spec.command, err, exc_info=True
                 )
-            if index != len(QUERY_SPECS) - 1:
+            if index != len(specs) - 1:
                 await asyncio.sleep(self._command_delay)
+        if specs and not values:
+            raise BwtConnectionError(f"No command was answered: {last_error}")
         return values

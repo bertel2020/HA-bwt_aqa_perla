@@ -133,3 +133,23 @@ async def _test_only_wrong_command_times_out() -> None:
     other = protocol.build_frame(protocol.Command.REGENERATION_COUNT, b"\x01\x00")
     with pytest.raises(client_module.BwtConnectionError):
         await make_client(other).async_query(SPEC)
+
+
+def test_read_keeps_other_values_when_one_command_fails() -> None:
+    asyncio.run(_test_read_keeps_other_values_when_one_command_fails())
+
+
+async def _test_read_keeps_other_values_when_one_command_fails() -> None:
+    other = next(s for s in protocol.QUERY_SPECS if s.key == "regeneration_count")
+    client = make_client(RESPONSE)  # answers only the first command
+    values = await client.async_read([SPEC, other])
+    assert values == {"water_consumption_24h": 1234}
+
+
+def test_read_raises_when_nothing_is_answered() -> None:
+    asyncio.run(_test_read_raises_when_nothing_is_answered())
+
+
+async def _test_read_raises_when_nothing_is_answered() -> None:
+    with pytest.raises(client_module.BwtConnectionError):
+        await make_client(b"").async_read([SPEC])

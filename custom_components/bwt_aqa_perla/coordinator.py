@@ -10,7 +10,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .client import BwtAqaPerlaClient, BwtConnectionError
 from .const import DOMAIN
-from .protocol import BwtProtocolError
+from .protocol import QUERY_SPECS, BwtProtocolError
+from .tracker import ValueTracker
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,12 +31,14 @@ class BwtAqaPerlaCoordinator(DataUpdateCoordinator[dict[str, int | float | str]]
             update_interval=timedelta(seconds=poll_interval),
         )
         self.client = client
+        self._tracker = ValueTracker()
 
     async def _async_update_data(self) -> dict[str, int | float | str]:
         """Fetch all values from the appliance."""
 
         try:
-            return await self.client.async_update()
+            received = await self.client.async_read(QUERY_SPECS)
+            return self._tracker.update((spec.key for spec in QUERY_SPECS), received)
         except (BwtConnectionError, BwtProtocolError) as err:
             raise UpdateFailed(str(err)) from err
         finally:
