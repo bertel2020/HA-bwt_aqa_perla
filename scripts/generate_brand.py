@@ -43,8 +43,18 @@ def drop_points(scale: float, dx: float, dy: float, n: int = 80):
         for i in range(1, n + 1):
             t = i / n
             u = 1 - t
-            x = u**3 * cur[0] + 3 * u**2 * t * c1[0] + 3 * u * t**2 * c2[0] + t**3 * end[0]
-            y = u**3 * cur[1] + 3 * u**2 * t * c1[1] + 3 * u * t**2 * c2[1] + t**3 * end[1]
+            x = (
+                u**3 * cur[0]
+                + 3 * u**2 * t * c1[0]
+                + 3 * u * t**2 * c2[0]
+                + t**3 * end[0]
+            )
+            y = (
+                u**3 * cur[1]
+                + 3 * u**2 * t * c1[1]
+                + 3 * u * t**2 * c2[1]
+                + t**3 * end[1]
+            )
             pts.append((x, y))
         cur = end
     return [(x * scale + dx, y * scale + dy) for x, y in pts]
@@ -94,7 +104,9 @@ def render_icon(size: int) -> Image.Image:
     scale = n / 512
     bg = vertical_gradient((n, n), LIGHT, DEEP)
     mask = Image.new("L", (n, n), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, n - 1, n - 1], radius=112 * scale, fill=255)
+    ImageDraw.Draw(mask).rounded_rectangle(
+        [0, 0, n - 1, n - 1], radius=112 * scale, fill=255
+    )
     canvas = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     canvas.paste(bg, mask=mask)
     layer = Image.new("RGBA", (n, n), (0, 0, 0, 0))
