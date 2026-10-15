@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0 (unveröffentlicht)
+## 1.0.0 (unveröffentlicht)
 
 ### Achtung beim Update
 
