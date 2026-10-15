@@ -64,6 +64,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         translation_key="water_consumption_24h",
         native_unit_of_measurement=UnitOfVolume.LITERS,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="total_water_consumption",
@@ -71,6 +72,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfVolume.LITERS,
         device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="total_salt_consumption",
