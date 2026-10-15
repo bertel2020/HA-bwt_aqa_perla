@@ -24,7 +24,7 @@ Versionen folgen dem Feld `version` in
 - Diagnose-Download mit geschwärzter Konfiguration, Werten und Roh-Frames.
 - Sensoren werden nur für Werte angelegt, die die Anlage tatsächlich meldet.
 - Das Gerät heißt wie der Konfigurationseintrag.
-- Symbole für die Sensoren.
+- Symbole für die Sensoren und ein eigenes Logo (Wassertropfen mit Perle) statt der BWT-Markenabbildungen, inklusive Variante für dunkle Oberflächen.
 
 ### Behoben
 

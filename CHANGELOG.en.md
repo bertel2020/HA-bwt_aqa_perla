@@ -23,7 +23,7 @@ All notable changes to this project are documented here. Versions follow the
 - Diagnostics download with redacted configuration, values and raw frames.
 - Sensors are only created for values the appliance actually reports.
 - The device is named after the config entry.
-- Icons for the sensors.
+- Icons for the sensors and an own logo (water drop with a pearl) instead of the BWT brand images, including a variant for dark themes.
 
 ### Fixed
 

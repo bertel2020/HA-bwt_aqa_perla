@@ -228,7 +228,7 @@ The integration only reads from the appliance and sends no write commands. It is
 
 ## Trademarks
 
-The integration contains the current BWT brand logo and the square BWT app icon in the local `brand/` directory supported by Home Assistant. “BWT”, “BWT Holding GmbH”, “BWT Wassertechnik GmbH” and “AQA Perla” are trademarks of their respective owners; the trademark rights remain with BWT. The trademarks and brand images are not part of this project's open-source license.
+The logo and icon of this integration are original designs (`custom_components/bwt_aqa_perla/brand/`, source in `assets/`) and are covered by this project's license. “BWT”, “BWT Holding GmbH”, “BWT Wassertechnik GmbH” and “AQA Perla” are trademarks of their respective owners; they are mentioned solely to describe which hardware the integration works with.
 
 ## Copyright & license
 
