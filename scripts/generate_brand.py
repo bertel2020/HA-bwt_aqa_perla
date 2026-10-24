@@ -155,13 +155,26 @@ def render_logo(height: int, text_color) -> Image.Image:
     return canvas.resize((w // SS, h // SS), Image.LANCZOS)
 
 
+def on_plate(logo: Image.Image) -> Image.Image:
+    """Put the logo on a white rounded plate so it reads on light and dark pages."""
+
+    margin = round(logo.height * 0.12)
+    plate = Image.new("RGBA", (logo.width + 2 * margin, logo.height + 2 * margin))
+    ImageDraw.Draw(plate).rounded_rectangle(
+        [0, 0, plate.width - 1, plate.height - 1],
+        radius=margin * 1.5,
+        fill=(255, 255, 255, 255),
+    )
+    plate.alpha_composite(logo, (margin, margin))
+    return plate
+
+
 def main() -> None:
     """Render the README logo; the integration's brand/ images stay untouched."""
 
     out = ROOT / "assets"
     out.mkdir(exist_ok=True)
-    render_logo(256, INK).save(out / "logo.png")
-    render_logo(256, (235, 245, 252)).save(out / "logo_dark.png")
+    on_plate(render_logo(256, INK)).save(out / "logo_readme.png")
     print("written to", out)
 
 
