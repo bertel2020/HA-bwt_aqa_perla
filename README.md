@@ -123,6 +123,7 @@ Die Entity-ID entsteht aus Gerätename + Entity-Name (Home Assistants Standard-S
 | Friendly Name | Entity-ID | Befehl | Beschreibung |
 |---|---|---|---|
 | Wasserverbrauch 24 h | `sensor.bwt_aqa_perla_wasserverbrauch_24_h` | `0x08` | Wasserverbrauch der letzten 24 Stunden (gleitender Wert) |
+| Verbrauch 24 h (Höchstwert?) | `sensor.bwt_aqa_perla_verbrauch_24_h_hochstwert` | `0x09` | Vermutlich der höchste 24-h-Verbrauch seit Inbetriebnahme (aus SoftControl abgeleitet); Diagnose, optional, standardmäßig deaktiviert |
 | Wasserverbrauch gesamt | `sensor.bwt_aqa_perla_wasserverbrauch_gesamt` | `0x10` | Steigender Gesamtzähler, geeignet für das Wasser-Dashboard |
 | Salzverbrauch gesamt | `sensor.bwt_aqa_perla_salzverbrauch_gesamt` | `0x13` | Steigender Gesamtzähler in kg (Rohwert geteilt durch 1000) |
 | Spitzendurchfluss heute | `sensor.bwt_aqa_perla_spitzendurchfluss_heute` | `0x05` | Spitzendurchfluss heute; optional |
@@ -145,6 +146,7 @@ Die Entity-ID entsteht aus Gerätename + Entity-Name (Home Assistants Standard-S
 | Softwareversion Bedienteil | `sensor.bwt_aqa_perla_softwareversion_bedienteil` | `0x19` | Version des Bedienteils, z. B. `155`; Diagnose |
 | Letzte erfolgreiche Abfrage | `sensor.bwt_aqa_perla_letzte_erfolgreiche_abfrage` | – | Zeitpunkt der letzten erfolgreichen Abfrage; Diagnose, bleibt auch bei Ausfall verfügbar |
 | Fehlgeschlagene Abfragen | `sensor.bwt_aqa_perla_fehlgeschlagene_abfragen` | – | Anzahl fehlgeschlagener Abfragen seit dem Start; Diagnose |
+| Kalenderwoche des Geräts | `sensor.bwt_aqa_perla_kalenderwoche_des_gerats` | `0x27` | Vermutlich die Kalenderwoche des Geräts (zeigt eine falsch gehende Geräteuhr); Diagnose, optional, standardmäßig deaktiviert |
 | Softwareversion kombiniert | `sensor.bwt_aqa_perla_softwareversion_kombiniert` | `0x19` | Kombinierte Antwort, z. B. `3.94#155`; Diagnose, standardmäßig deaktiviert |
 
 Die Zustände von **Gerätetyp** und **Regenerationsschritt** sind Schlüssel (`type_12`, `step_0`), die Oberfläche zeigt die übersetzte Bezeichnung. Automationen sollten deshalb auf diese Schlüssel prüfen oder den Binärsensor „Regeneration aktiv“ verwenden.

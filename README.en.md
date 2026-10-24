@@ -123,6 +123,7 @@ The entity ID is built from device name + entity name (Home Assistant's default 
 | Friendly name | Entity ID | Command | Description |
 |---|---|---|---|
 | Water consumption 24 h | `sensor.bwt_aqa_perla_water_consumption_24_h` | `0x08` | Water consumption over the last 24 hours (rolling value) |
+| Water consumption 24 h (maximum?) | `sensor.bwt_aqa_perla_water_consumption_24_h_maximum` | `0x09` | Probably the highest 24 h consumption since commissioning (inferred from SoftControl); diagnostic, optional, disabled by default |
 | Total water consumption | `sensor.bwt_aqa_perla_total_water_consumption` | `0x10` | Increasing total counter, suitable for the water dashboard |
 | Total salt consumption | `sensor.bwt_aqa_perla_total_salt_consumption` | `0x13` | Increasing total counter in kg (raw value divided by 1000) |
 | Peak flow today | `sensor.bwt_aqa_perla_peak_flow_today` | `0x05` | Peak flow today; optional |
@@ -145,6 +146,7 @@ The entity ID is built from device name + entity name (Home Assistant's default 
 | Control panel software version | `sensor.bwt_aqa_perla_control_panel_software_version` | `0x19` | Control panel version, e.g. `155`; diagnostic |
 | Last successful poll | `sensor.bwt_aqa_perla_last_successful_poll` | – | Time of the last successful poll; diagnostic, stays available during an outage |
 | Failed polls | `sensor.bwt_aqa_perla_failed_polls` | – | Number of failed polls since start; diagnostic |
+| Device calendar week | `sensor.bwt_aqa_perla_device_calendar_week` | `0x27` | Probably the appliance's calendar week (reveals a wrong device clock); diagnostic, optional, disabled by default |
 | Combined software version | `sensor.bwt_aqa_perla_combined_software_version` | `0x19` | Combined response, e.g. `3.94#155`; diagnostic, disabled by default |
 
 The states of **Device type** and **Regeneration step** are keys (`type_12`, `step_0`); the UI shows the translated label. Automations should therefore compare against these keys or use the “Regeneration active” binary sensor.
