@@ -6,6 +6,13 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Versionen folgen dem Feld `version` in
 `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unveröffentlicht
+
+### Neu
+
+- Optionale Diagnosesensoren „Kalenderwoche des Geräts“ (`0x27`) und „Verbrauch 24 h (Höchstwert?)“ (`0x09`), beide standardmäßig deaktiviert; die Bedeutung ist aus der Anzeige von SoftControl abgeleitet.
+- Die Pause zwischen zwei Befehlen beträgt 0,2 statt 0,5 s (wie bei SoftControl); eine volle Abfrage dauert damit etwa 3,5 statt 8,5 s.
+
 ## 1.1.0 – 2026-10-15
 
 ### Achtung beim Update

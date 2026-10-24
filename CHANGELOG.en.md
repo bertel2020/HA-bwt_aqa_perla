@@ -5,6 +5,13 @@
 All notable changes to this project are documented here. Versions follow the
 `version` field in `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unreleased
+
+### New
+
+- Optional diagnostic sensors “Device calendar week” (`0x27`) and “Water consumption 24 h (maximum?)” (`0x09`), both disabled by default; their meaning is inferred from SoftControl's display.
+- The pause between two commands is 0.2 instead of 0.5 s (as in SoftControl); a full read now takes about 3.5 instead of 8.5 s.
+
 ## 1.1.0 – 2026-10-15
 
 ### Breaking changes
