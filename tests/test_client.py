@@ -123,3 +123,9 @@ async def test_query_records_last_frame() -> None:
     client = make_client(RESPONSE)
     await client.async_query(SPEC)
     assert client.last_frames[int(SPEC.command)] == RESPONSE.hex(" ").upper()
+
+
+def test_default_command_delay_matches_softcontrol_pace() -> None:
+    assert client_module.COMMAND_DELAY == 0.2
+    client = client_module.BwtAqaPerlaClient(lambda: None)  # type: ignore[arg-type]
+    assert client._command_delay == 0.2

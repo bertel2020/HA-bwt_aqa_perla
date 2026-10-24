@@ -18,6 +18,10 @@ from .protocol import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# SoftControl III spaces its telegrams 100-200 ms apart without retries, so
+# this pace is known to be tolerated by the appliance.
+COMMAND_DELAY = 0.2
+
 StreamFactory = Callable[
     [], Awaitable[tuple[asyncio.StreamReader, asyncio.StreamWriter]]
 ]
@@ -39,7 +43,7 @@ class BwtAqaPerlaClient:
         stream_factory: StreamFactory,
         *,
         response_timeout: float = 3.0,
-        command_delay: float = 0.5,
+        command_delay: float = COMMAND_DELAY,
     ) -> None:
         """Initialize the client."""
 
