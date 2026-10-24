@@ -5,6 +5,12 @@
 All notable changes to this project are documented here. Versions follow the
 `version` field in `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unreleased
+
+### New
+
+- “Regenerating column” sensor (None / Column 1 / Column 2) from bit 7 of the regeneration step. Bit 7 alternates with every regeneration and is confirmed on the appliance over five regenerations (the column's remaining capacity jumps back after the regeneration). In the T-steps (`T-Power On …`) the bit means something else and is not evaluated.
+
 ## 1.2.0 – 2026-10-24
 
 ### New

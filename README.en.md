@@ -135,6 +135,7 @@ The entity ID is built from device name + entity name (Home Assistant's default 
 | Regenerations | `sensor.bwt_aqa_perla_regenerations` | `0x11` | Increasing counter of regenerations |
 | Regenerations since service | `sensor.bwt_aqa_perla_regenerations_since_service` | `0x12` | Regenerations since the last service; optional |
 | Regeneration step | `sensor.bwt_aqa_perla_regeneration_step` | `0x04` | Current step as text; attributes `raw_value`, `normalized_step`, `flag_bit_7`, `short_code` |
+| Regenerating column | `sensor.bwt_aqa_perla_regenerating_column` | `0x04` | “None”, “Column 1” or “Column 2” from bit 7 of the regeneration step; only during regeneration steps 1–10 (confirmed on the appliance over five regenerations) |
 | Regenerant saving | `sensor.bwt_aqa_perla_regenerant_saving` | `0x14` | Raw value, unit not conclusively determined; optional |
 | Regeneration active | `binary_sensor.bwt_aqa_perla_regeneration_active` | derived | On while the step is not “columns in operation” |
 | Device type | `sensor.bwt_aqa_perla_device_type` | `0x01` | Device type, e.g. “Aqua Perla”; diagnostic, optional |

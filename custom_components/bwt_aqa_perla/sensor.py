@@ -155,6 +155,12 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         options=[f"step_{index}" for index in REGENERATION_STEPS],
     ),
     SensorEntityDescription(
+        key="regenerating_column",
+        translation_key="regenerating_column",
+        device_class=SensorDeviceClass.ENUM,
+        options=["none", "column_1", "column_2"],
+    ),
+    SensorEntityDescription(
         key="regenerant_saving",
         translation_key="regenerant_saving",
         state_class=SensorStateClass.MEASUREMENT,

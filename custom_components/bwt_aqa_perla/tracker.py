@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 
-from .protocol import split_software_version
+from .protocol import normalize_regeneration_step, split_software_version
 
 MAX_MISSES = 3
+
+# Steps 1-10 are the regeneration proper; higher ones are the T-steps.
+REGENERATION_LAST_STEP = 10
 
 type Value = int | float | str
 
@@ -52,6 +55,15 @@ def derive_values(values: Mapping[str, Value]) -> dict[str, Value]:
         result["software_version_power_electronics"] = electronics
         if control_panel is not None:
             result["software_version_control_panel"] = control_panel
+    step = values.get("regeneration_step")
+    if isinstance(step, int):
+        # Bit 7 names the column during a real regeneration step (1-10); it
+        # alternates between successive regenerations and, in the T-steps
+        # that run every few hours, carries a different meaning.
+        if 1 <= normalize_regeneration_step(step) <= REGENERATION_LAST_STEP:
+            result["regenerating_column"] = "column_2" if step & 0x80 else "column_1"
+        else:
+            result["regenerating_column"] = "none"
     for column in (1, 2):
         nominal = values.get(f"nominal_capacity_column_{column}")
         remaining = values.get(f"remaining_capacity_column_{column}")

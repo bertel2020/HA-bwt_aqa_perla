@@ -207,6 +207,14 @@
       },
       "device_calendar_week": {
         "name": "Device calendar week"
+      },
+      "regenerating_column": {
+        "name": "Regenerating column",
+        "state": {
+          "none": "None",
+          "column_1": "Column 1",
+          "column_2": "Column 2"
+        }
       }
     }
   },

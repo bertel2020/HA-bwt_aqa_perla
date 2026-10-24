@@ -207,6 +207,14 @@
       },
       "device_calendar_week": {
         "name": "Kalenderwoche des Geräts"
+      },
+      "regenerating_column": {
+        "name": "Regenerierende Säule",
+        "state": {
+          "none": "Keine",
+          "column_1": "Säule 1",
+          "column_2": "Säule 2"
+        }
       }
     }
   },

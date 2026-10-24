@@ -68,3 +68,22 @@ def test_remaining_capacity_percent_is_derived() -> None:
     )
     assert result["remaining_capacity_percent_column_1"] == 75.0
     assert "remaining_capacity_percent_column_2" not in result
+
+
+def test_regenerating_column_follows_bit_7_during_regeneration_steps() -> None:
+    assert (
+        tracker.derive_values({"regeneration_step": 0x82})["regenerating_column"]
+        == "column_2"
+    )
+    assert (
+        tracker.derive_values({"regeneration_step": 0x02})["regenerating_column"]
+        == "column_1"
+    )
+
+
+def test_regenerating_column_is_none_in_operation_and_t_steps() -> None:
+    for raw in (0, 17, 145, 18, 146):
+        assert (
+            tracker.derive_values({"regeneration_step": raw})["regenerating_column"]
+            == "none"
+        )

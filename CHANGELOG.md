@@ -6,6 +6,12 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Versionen folgen dem Feld `version` in
 `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unveröffentlicht
+
+### Neu
+
+- Sensor „Regenerierende Säule“ (Keine / Säule 1 / Säule 2) aus Bit 7 des Regenerationsschritts. Bit 7 wechselt bei jeder Regeneration und ist an der Anlage über fünf Regenerationen bestätigt (die Restkapazität der Säule springt nach der Regeneration zurück). Bei den T-Schritten (`T-Power On …`) hat das Bit eine andere Bedeutung und wird nicht ausgewertet.
+
 ## 1.2.0 – 2026-10-24
 
 ### Neu

@@ -81,6 +81,10 @@ async def test_regeneration_binary_sensor(
     step = hass.states.get(_entity_id(hass, tcp_entry, "sensor", "regeneration_step"))
     assert step.state == "step_2"
     assert step.attributes["flag_bit_7"] is True
+    column = hass.states.get(
+        _entity_id(hass, tcp_entry, "sensor", "regenerating_column")
+    )
+    assert column.state == "column_2"
 
 
 async def test_failed_poll_marks_entities_unavailable_then_recovers(

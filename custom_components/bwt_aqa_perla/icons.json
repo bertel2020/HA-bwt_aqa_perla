@@ -68,6 +68,9 @@
       },
       "device_calendar_week": {
         "default": "mdi:calendar-week"
+      },
+      "regenerating_column": {
+        "default": "mdi:view-column-outline"
       }
     }
   }
