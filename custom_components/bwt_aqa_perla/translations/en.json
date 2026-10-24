@@ -201,6 +201,12 @@
       },
       "failed_polls": {
         "name": "Failed polls"
+      },
+      "max_water_consumption_24h": {
+        "name": "Water consumption 24 h (maximum?)"
+      },
+      "device_calendar_week": {
+        "name": "Device calendar week"
       }
     }
   },

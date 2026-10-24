@@ -168,3 +168,11 @@ def test_fast_and_slow_specs_partition_all_queries() -> None:
         protocol.QUERY_SPECS
     )
     assert not set(protocol.FAST_SPECS) & set(protocol.SLOW_SPECS)
+
+
+def test_new_optional_values_decode() -> None:
+    week = next(s for s in protocol.QUERY_SPECS if s.key == "device_calendar_week")
+    peak = next(s for s in protocol.QUERY_SPECS if s.key == "max_water_consumption_24h")
+    assert week.optional and peak.optional
+    assert protocol.decode_value(b"\x2a", week) == 42
+    assert protocol.decode_value((1500).to_bytes(2, "little"), peak) == 1500

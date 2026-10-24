@@ -72,6 +72,15 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         suggested_display_precision=0,
     ),
     SensorEntityDescription(
+        key="max_water_consumption_24h",
+        translation_key="max_water_consumption_24h",
+        native_unit_of_measurement=UnitOfVolume.LITERS,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=0,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
         key="total_water_consumption",
         translation_key="total_water_consumption",
         native_unit_of_measurement=UnitOfVolume.LITERS,
@@ -154,6 +163,12 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         key="commissioning_date",
         translation_key="commissioning_date",
         entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    SensorEntityDescription(
+        key="device_calendar_week",
+        translation_key="device_calendar_week",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
         key="software_version",

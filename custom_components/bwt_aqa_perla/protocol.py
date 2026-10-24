@@ -29,6 +29,7 @@ class Command(IntEnum):
     PEAK_FLOW_24H = 0x06
     PEAK_FLOW_SINCE_COMMISSIONING = 0x07
     WATER_CONSUMPTION_24H = 0x08
+    MAX_WATER_CONSUMPTION_24H = 0x09
     TOTAL_WATER_CONSUMPTION = 0x10
     REGENERATION_COUNT = 0x11
     REGENERATION_COUNT_SINCE_SERVICE = 0x12
@@ -36,6 +37,7 @@ class Command(IntEnum):
     REGENERANT_SAVING = 0x14
     COMMISSIONING_DATE = 0x15
     SOFTWARE_VERSION = 0x19
+    DEVICE_CALENDAR_WEEK = 0x27
     NOMINAL_CAPACITY_COLUMN_1 = 0x25
     NOMINAL_CAPACITY_COLUMN_2 = 0x26
 
@@ -71,6 +73,14 @@ QUERY_SPECS: tuple[QuerySpec, ...] = (
         optional=True,
     ),
     QuerySpec("water_consumption_24h", Command.WATER_CONSUMPTION_24H, 2),
+    # Meaning inferred from SoftControl's screen layout: the highest 24 h
+    # consumption since commissioning. Optional until confirmed on a device.
+    QuerySpec(
+        "max_water_consumption_24h",
+        Command.MAX_WATER_CONSUMPTION_24H,
+        2,
+        optional=True,
+    ),
     QuerySpec("total_water_consumption", Command.TOTAL_WATER_CONSUMPTION, 4),
     QuerySpec("total_salt_consumption", Command.TOTAL_SALT_CONSUMPTION, 4, 0.001),
     QuerySpec("nominal_capacity_column_1", Command.NOMINAL_CAPACITY_COLUMN_1, 2),
@@ -96,6 +106,9 @@ QUERY_SPECS: tuple[QuerySpec, ...] = (
         optional=True,
         value_type=ValueType.ASCII,
     ),
+    # One byte shown next to "aktuelle Kalenderwoche" in SoftControl; probably
+    # the appliance's own calendar week, which reveals a wrong device clock.
+    QuerySpec("device_calendar_week", Command.DEVICE_CALENDAR_WEEK, 1, optional=True),
     QuerySpec(
         "software_version",
         Command.SOFTWARE_VERSION,

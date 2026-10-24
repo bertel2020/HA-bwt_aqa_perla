@@ -62,6 +62,12 @@
       },
       "failed_polls": {
         "default": "mdi:alert-circle-outline"
+      },
+      "max_water_consumption_24h": {
+        "default": "mdi:water-plus"
+      },
+      "device_calendar_week": {
+        "default": "mdi:calendar-week"
       }
     }
   }
