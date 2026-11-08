@@ -106,6 +106,7 @@ In der Integration **Netzwerk (ser2net / TCP)** wählen, den Host des Rechners u
 |---|---:|---|---|
 | Abfrageintervall | 60 s | 30–3600 s | Intervall für alle Werte außer dem Regenerationsschritt |
 | Abfrageintervall Regeneration | 15 s | 5–3600 s | Intervall für den Regenerationsschritt |
+| Verbindung dauerhaft offen halten | aus | an/aus | Standardmäßig wird die Verbindung nach jeder Abfrage geschlossen, damit eine ser2net-Brücke für einen zweiten Client (z. B. IP-Symcon) frei bleibt. Ist die Option an, bleibt sie zwischen den Abfragen offen; ein zweiter Client wird dann ausgesperrt, wenn die Brücke nur eine Verbindung erlaubt. |
 
 Änderungen laden die Integration automatisch neu.
 

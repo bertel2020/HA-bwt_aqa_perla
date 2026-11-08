@@ -14,6 +14,7 @@ CONF_BAUDRATE: Final = "baudrate"
 CONF_TCP_PORT: Final = "tcp_port"
 CONF_POLL_INTERVAL: Final = "poll_interval"
 CONF_FAST_POLL_INTERVAL: Final = "fast_poll_interval"
+CONF_KEEP_CONNECTION: Final = "keep_connection_open"
 
 CONNECTION_SERIAL: Final = "serial"
 CONNECTION_TCP: Final = "tcp"
@@ -26,6 +27,7 @@ SUPPORTED_BAUDRATES: Final = (1200, 2400, 4800, 9600, 19200, 38400, 56000)
 DEFAULT_TCP_PORT: Final = 8899
 DEFAULT_POLL_INTERVAL: Final = 60
 DEFAULT_FAST_POLL_INTERVAL: Final = 15
+DEFAULT_KEEP_CONNECTION: Final = False
 MIN_POLL_INTERVAL: Final = 30
 MIN_FAST_POLL_INTERVAL: Final = 5
 MAX_POLL_INTERVAL: Final = 3600

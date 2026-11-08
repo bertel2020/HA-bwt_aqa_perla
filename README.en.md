@@ -106,6 +106,7 @@ Via the integration's **Configure** button:
 |---|---:|---|---|
 | Polling interval | 60 s | 30–3600 s | Interval for all values except the regeneration step |
 | Regeneration polling interval | 15 s | 5–3600 s | Interval for the regeneration step |
+| Keep connection open | off | on/off | By default the connection is closed after every poll so that a ser2net bridge stays free for a second client (e.g. IP-Symcon). When on, it stays open between polls; a second client is locked out if the bridge allows only one connection. |
 
 Changes reload the integration automatically.
 

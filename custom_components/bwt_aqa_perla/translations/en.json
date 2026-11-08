@@ -56,10 +56,11 @@
     "step": {
       "init": {
         "title": "Polling intervals",
-        "description": "Interval for all values except the regeneration step (at least 30 s) and for the regeneration step (at least 5 s). Changes reload the integration automatically. Change port, host and baud rate via “Reconfigure”.",
+        "description": "Interval for all values except the regeneration step (at least 30 s) and for the regeneration step (at least 5 s). By default the connection is closed after every poll so that a ser2net bridge stays free for a second client; “Keep connection open” leaves it open between polls. Changes reload the integration automatically. Change port, host and baud rate via “Reconfigure”.",
         "data": {
           "poll_interval": "Polling interval",
-          "fast_poll_interval": "Regeneration polling interval"
+          "fast_poll_interval": "Regeneration polling interval",
+          "keep_connection_open": "Keep connection open"
         }
       }
     }

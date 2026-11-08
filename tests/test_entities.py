@@ -111,7 +111,7 @@ async def test_unload_closes_client(
     closed = client.closed
     assert await hass.config_entries.async_unload(tcp_entry.entry_id)
     assert tcp_entry.state is ConfigEntryState.NOT_LOADED
-    assert client.closed > closed
+    assert client.closed == closed + 1
 
 
 async def test_diagnostics_redacts_target(
@@ -195,3 +195,32 @@ async def test_no_data_issue_is_raised_after_long_outage_and_cleared(
         async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=60))
         await hass.async_block_till_done()
         assert registry.async_get_issue(DOMAIN, issue_id) is None
+
+
+async def test_connection_is_closed_after_every_poll_by_default(
+    hass: HomeAssistant, client: FakeClient, tcp_entry: MockConfigEntry
+) -> None:
+    await _setup(hass, tcp_entry)
+    closed = client.closed
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=20))
+    await hass.async_block_till_done()
+    assert client.closed == closed + 1
+
+
+async def test_keep_connection_open_skips_close_but_closes_on_error(
+    hass: HomeAssistant, client: FakeClient, tcp_entry: MockConfigEntry
+) -> None:
+    tcp_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        tcp_entry, options={"keep_connection_open": True}
+    )
+    await _setup(hass, tcp_entry)
+    closed = client.closed
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=20))
+    await hass.async_block_till_done()
+    assert client.closed == closed
+
+    client.fail = True
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=40))
+    await hass.async_block_till_done()
+    assert client.closed == closed + 1

@@ -56,10 +56,11 @@
     "step": {
       "init": {
         "title": "Abfrageintervalle",
-        "description": "Intervall für alle Werte außer dem Regenerationsschritt (mindestens 30 s) und für den Regenerationsschritt (mindestens 5 s). Änderungen laden die Integration automatisch neu. Port, Host und Baudrate ändert man über „Neu konfigurieren“.",
+        "description": "Intervall für alle Werte außer dem Regenerationsschritt (mindestens 30 s) und für den Regenerationsschritt (mindestens 5 s). Standardmäßig wird die Verbindung nach jeder Abfrage geschlossen, damit eine ser2net-Brücke für einen zweiten Client frei bleibt; „Verbindung dauerhaft offen halten“ lässt sie zwischen den Abfragen bestehen. Änderungen laden die Integration automatisch neu. Port, Host und Baudrate ändert man über „Neu konfigurieren“.",
         "data": {
           "poll_interval": "Abfrageintervall",
-          "fast_poll_interval": "Abfrageintervall Regeneration"
+          "fast_poll_interval": "Abfrageintervall Regeneration",
+          "keep_connection_open": "Verbindung dauerhaft offen halten"
         }
       }
     }

@@ -136,10 +136,19 @@ async def test_options_flow_saves_intervals(
     tcp_entry.add_to_hass(hass)
     result = await hass.config_entries.options.async_init(tcp_entry.entry_id)
     result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"poll_interval": 120, "fast_poll_interval": 10}
+        result["flow_id"],
+        {
+            "poll_interval": 120,
+            "fast_poll_interval": 10,
+            "keep_connection_open": True,
+        },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert tcp_entry.options == {"poll_interval": 120, "fast_poll_interval": 10}
+    assert tcp_entry.options == {
+        "poll_interval": 120,
+        "fast_poll_interval": 10,
+        "keep_connection_open": True,
+    }
 
 
 def test_migrate_legacy_tcp_data() -> None:

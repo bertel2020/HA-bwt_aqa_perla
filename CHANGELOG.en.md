@@ -5,6 +5,12 @@
 All notable changes to this project are documented here. Versions follow the
 `version` field in `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unreleased
+
+### New
+
+- “Keep connection open” option. By default nothing changes: the connection is closed after every poll. On errors it is closed and re-established even with the option on.
+
 ## 1.3.0 – 2026-10-24
 
 ### New

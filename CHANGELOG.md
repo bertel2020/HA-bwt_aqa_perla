@@ -6,6 +6,12 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Versionen folgen dem Feld `version` in
 `custom_components/bwt_aqa_perla/manifest.json`.
 
+## Unveröffentlicht
+
+### Neu
+
+- Option „Verbindung dauerhaft offen halten“. Standardmäßig bleibt alles wie bisher: Die Verbindung wird nach jeder Abfrage geschlossen. Bei Fehlern wird sie auch mit der Option geschlossen und neu aufgebaut.
+
 ## 1.3.0 – 2026-10-24
 
 ### Neu

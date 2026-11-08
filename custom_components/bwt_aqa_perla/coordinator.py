@@ -30,6 +30,7 @@ class BwtAqaPerlaCoordinator(DataUpdateCoordinator[dict[str, int | float | str]]
         client: BwtAqaPerlaClient,
         poll_interval: int,
         fast_poll_interval: int,
+        keep_connection: bool = False,
     ) -> None:
         """Initialize the coordinator."""
 
@@ -43,6 +44,7 @@ class BwtAqaPerlaCoordinator(DataUpdateCoordinator[dict[str, int | float | str]]
         self.client = client
         self._tracker = ValueTracker()
         self._poll_interval = poll_interval
+        self._keep_connection = keep_connection
         self._last_slow_poll: float | None = None
         self._last_success_monotonic = time.monotonic()
         self.last_success: datetime | None = None
@@ -51,6 +53,7 @@ class BwtAqaPerlaCoordinator(DataUpdateCoordinator[dict[str, int | float | str]]
     async def _async_update_data(self) -> dict[str, int | float | str]:
         """Fetch all values from the appliance."""
 
+        succeeded = False
         try:
             now = time.monotonic()
             # Fast values (regeneration step) are read on every cycle; the
@@ -64,14 +67,18 @@ class BwtAqaPerlaCoordinator(DataUpdateCoordinator[dict[str, int | float | str]]
             if slow_due:
                 self._last_slow_poll = now
             values = self._tracker.update((spec.key for spec in specs), received)
+            succeeded = True
         except (BwtConnectionError, BwtProtocolError) as err:
             self.failed_polls += 1
             self._update_no_data_issue(failed=True)
             raise UpdateFailed(str(err)) from err
         finally:
-            # A fresh connection for every poll avoids stale USB and bridge
-            # sessions, a known failure mode of this appliance generation.
-            await self.client.async_close()
+            # By default a fresh connection is used for every poll: it avoids
+            # stale USB and bridge sessions (a known failure mode of this
+            # appliance generation) and keeps a bridge free for a second
+            # client. The "keep connection open" option skips the close.
+            if not self._keep_connection or not succeeded:
+                await self.client.async_close()
         self.last_success = dt_util.utcnow()
         self._last_success_monotonic = time.monotonic()
         self._update_no_data_issue(failed=False)

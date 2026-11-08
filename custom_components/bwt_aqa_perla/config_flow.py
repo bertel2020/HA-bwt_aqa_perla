@@ -33,11 +33,13 @@ from .client import BwtConnectionError
 from .const import (
     CONF_BAUDRATE,
     CONF_FAST_POLL_INTERVAL,
+    CONF_KEEP_CONNECTION,
     CONF_POLL_INTERVAL,
     CONF_SERIAL_PORT,
     CONF_TCP_PORT,
     DEFAULT_BAUDRATE,
     DEFAULT_FAST_POLL_INTERVAL,
+    DEFAULT_KEEP_CONNECTION,
     DEFAULT_POLL_INTERVAL,
     DEFAULT_TCP_PORT,
     DEFAULT_TITLE,
@@ -278,6 +280,12 @@ class BwtAqaPerlaOptionsFlow(OptionsFlowWithReload):
                             )
                         ),
                     ): _interval_selector(MIN_FAST_POLL_INTERVAL),
+                    vol.Optional(
+                        CONF_KEEP_CONNECTION,
+                        default=bool(
+                            options.get(CONF_KEEP_CONNECTION, DEFAULT_KEEP_CONNECTION)
+                        ),
+                    ): bool,
                 }
             ),
         )
